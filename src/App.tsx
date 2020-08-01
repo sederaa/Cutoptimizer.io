@@ -1,25 +1,24 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import 'sanitize.css';
+import 'sanitize.css/forms.css';
+import 'sanitize.css/typography.css';
+import {Header} from './Header';
+import {Tagline} from './Tagline';
+import {InputSection} from './InputSection';
+import {CutList} from './CutList';
+import styled from 'styled-components';
 
-function App() {
+const StyledApp = styled.div`
+`
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <StyledApp>
+      <Header />
+      <Tagline />
+      <InputSection />
+      <CutList />
+    </StyledApp>
   );
 }
 
