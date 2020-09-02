@@ -20,14 +20,14 @@ export const Algo = () => {
 
   let originalState = {
     segments: [
-      { id: 0, len: 16, done: false },
-      { id: 1, len: 16, done: false },
-      { id: 2, len: 16, done: false },
-      { id: 3, len: 16, done: false }
+      { id: 0, len: 5, done: false },
+      { id: 1, len: 5, done: false },
+      { id: 2, len: 5, done: false },
+      { id: 3, len: 5, done: false }
     ],
     stock: [
-      { id: 0, len: 15, segments: [], price: 0 },
-      { id: 1, len: 18, segments: [], price: 0 }
+      { id: 0, len: 20, segments: [], price: 0 },
+      { id: 1, len: 20, segments: [], price: 0 }
     ],
     buyableStock: [
       { id: 1001, len: 15, segments: [], price: 1.23 },
@@ -35,6 +35,8 @@ export const Algo = () => {
     ] //,
     //actions: []
   };
+
+  const kerf = 1;
 
   // Pre-condition: All stock & buyablestock must have unique ids
 
@@ -76,6 +78,10 @@ export const Algo = () => {
       //log(state,`segment fits stock, adding segment to stock.segments list and setting done...`);
       stock.segments.push(segment);
       segment.done = true;
+      if (stock.len > stock.segments.reduce((accumulator, currentValue) => accumulator + currentValue.len, 0)){
+        stock.segments.push({id: -1, type:"kerf", len: kerf});
+      }
+
     } else if (state.buyableStock.some(bs => bs.len >= segment.len)) {
       //console.debug(`Can't fit segment ${segment.id} into stock ${stock.id}, but there is buyable stock that would fit.`);
       //log(state,`segment doesn't fit stock, but fits some buyable stock, looping through buyable stock...`);
