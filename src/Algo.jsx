@@ -3,7 +3,8 @@ import clone from 'rfdc';
 
 export const Algo = () => {
 
-  let state = {
+  // Non-obvious solution, where all cuts are taken from 2nd stock piece. trips up most other optimizers.
+  let originalState = {
     cuts: [
       { id: 0, len: 16, done: false },
       { id: 1, len: 16, done: false },
@@ -16,7 +17,11 @@ export const Algo = () => {
     ]
   };
 
-  console.debug(`Starting state: `, state);
+
+
+  // Pre-condition: All stock & buyablestock must have unique ids
+
+  console.debug(`Starting state: `, originalState);
 
   const addTotalsToSolution = (stateArg) => {
     stateArg.stock.forEach(s => s.used = s.cuts.reduce((accumulator2, currentValue2) => accumulator2 + currentValue2.len, 0));
@@ -29,42 +34,42 @@ export const Algo = () => {
   const createSolution = (stateArg, stockIndex) => {
     //console.group(`optimize: stockIndex = ${stockIndex}.`)
     stockIndex = stockIndex || 0;
-    let clonedState = clone()(stateArg);
+    let state = clone()(stateArg);
     //console.debug(`optimize: stateArg = `, clonedState, `, stockIndex = ${stockIndex}.`);
-    let cut = clonedState.cuts.find(c => !c.done);
+    let cut = state.cuts.find(c => !c.done);
 
     //console.debug(`Cut to fit: `, cut);
-    let stock = clonedState.stock[stockIndex];
+    let stock = state.stock[stockIndex];
 
-    clonedState.path = clonedState.path || "";
-    clonedState.path += ` (cut=${cut.id},stock=${stock.id})`;
+    state.path = state.path || "";
+    state.path += ` (cut=${cut.id},stock=${stock.id})`;
 
     if (cut.len <= (stock.len - stock.cuts.reduce((accumulator, currentValue) => accumulator + currentValue.len, 0))) {
-      clonedState.stock[stockIndex].cuts.push(cut);
+      state.stock[stockIndex].cuts.push(cut);
       cut.done = true;
     } else {
-      //console.debug(`Can't fit cut ${cut.id} into stock ${stock.id}. Bailing out...`);
+      console.debug(`Can't fit cut ${cut.id} into stock ${stock.id}. Bailing out...`);
       //console.groupEnd();
       return;
     }
 
-    if (clonedState.cuts.every(c => c.done)) {
-      console.info(`Solution: `, addTotalsToSolution(clonedState));
+    if (state.cuts.every(c => c.done)) {
+      console.info(`Solution: `, addTotalsToSolution(state));
       //console.groupEnd();
       return;
 
     }
 
-    for (let i = 0; i < clonedState.stock.length; i++) {
+    for (let i = 0; i < state.stock.length; i++) {
       //console.debug(`Calling optimize with: stock index = ${i}`);
-      createSolution(clonedState, i);
+      createSolution(state, i);
     }
     //console.groupEnd();
   };
 
-  for (let i = 0; i < state.stock.length; i++) {
+  for (let i = 0; i < originalState.stock.length; i++) {
     //console.debug(`Calling optimize with: stock index = ${i}`);
-    createSolution(state, i);
+    createSolution(originalState, i);
   }
 
   return <></>;
