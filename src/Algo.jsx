@@ -30,9 +30,10 @@ export const Algo = () => {
       { id: 1, len: 18, segments: [], price: 0 }
     ],
     buyableStock: [
-      { id: 2, len: 15, segments: [], price: 1.23 },
-      { id: 3, len: 20, segments: [], price: 2.34 },
-    ]
+      { id: 1001, len: 15, segments: [], price: 1.23 },
+      { id: 1002, len: 20, segments: [], price: 2.34 },
+    ] //,
+    //actions: []
   };
 
   // Pre-condition: All stock & buyablestock must have unique ids
@@ -52,31 +53,37 @@ export const Algo = () => {
     //console.group(`optimize: stockId = ${stockId}.`)
     let state = clone()(stateArg);
     //console.debug(`optimize: stateArg = `, state, `, stockId = ${stockId}.`);
+    //log(state,`createSolution: start.`);
+    //log(state,`stockId = ${stockId}.`);
     let segment = state.segments.find(c => !c.done);
-
+    //log(state,`segmentId = ${segment.id} (len = ${segment.len}, done = ${segment.done}).`);
     //console.debug(`segment to fit: `, segment);
     let stock = state.stock.find(s => s.id === stockId);
     let buyableStock = state.buyableStock.find(s => s.id === stockId);
     if (buyableStock){
       //console.debug(`Found buyable stock ${buyableStock.id}, cloning and adding to stock...`);
       stock = clone()(buyableStock);
+      stock.id = state.stock.reduce((highest, currentValue) => highest = Math.max(highest, currentValue.id), 0) + 1;
       state.stock.push(stock);
+      //log(state,`added buyable stock with new id = ${stock.id}.`);
     }
-
+    //log(state,`stock.id = ${stock.id} (len = ${stock.len}).`);
+    
     state.path = state.path || "";
     state.path += ` (segment=${segment.id},stock=${stock.id})`;
 
     if (segment.len <= (stock.len - stock.segments.reduce((accumulator, currentValue) => accumulator + currentValue.len, 0))) {
+      //log(state,`segment fits stock, adding segment to stock.segments list and setting done...`);
       stock.segments.push(segment);
       segment.done = true;
     } else if (state.buyableStock.some(bs => bs.len >= segment.len)) {
       //console.debug(`Can't fit segment ${segment.id} into stock ${stock.id}, but there is buyable stock that would fit.`);
-  
+      //log(state,`segment doesn't fit stock, but fits some buyable stock, looping through buyable stock...`);
       for (const buyableStock of state.buyableStock.filter(bs => bs.len >= segment.len)) {
         //console.debug(`Would call createSolution with id ${buyableStock.id}. state = `, state);
+        //log(state,`calling createSolution with buyableStock.id ${buyableStock.id}...`);
         createSolution(state, buyableStock.id);
       }
-  
       return;
   
     } else {
@@ -106,6 +113,14 @@ export const Algo = () => {
 
   return <></>;
 }
+
+// const log = (stateArg, message) => {
+//   stateArg.actions.push(`${getRandom(10000,99999)}: ${message}`);
+// }
+
+// const getRandom = (min,max) => {
+//   return Math.random() * (max - min) + min;
+// }
 
 /*
 TODO:
