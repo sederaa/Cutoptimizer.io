@@ -31,21 +31,20 @@ export const Algo = () => {
     return stateArg;
   }
 
-  const createSolution = (stateArg, stockIndex) => {
+  const createSolution = (stateArg, stockId) => {
     //console.group(`optimize: stockIndex = ${stockIndex}.`)
-    stockIndex = stockIndex || 0;
     let state = clone()(stateArg);
     //console.debug(`optimize: stateArg = `, clonedState, `, stockIndex = ${stockIndex}.`);
     let cut = state.cuts.find(c => !c.done);
 
     //console.debug(`Cut to fit: `, cut);
-    let stock = state.stock[stockIndex];
+    let stock = state.stock.find(s => s.id === stockId);
 
     state.path = state.path || "";
     state.path += ` (cut=${cut.id},stock=${stock.id})`;
 
     if (cut.len <= (stock.len - stock.cuts.reduce((accumulator, currentValue) => accumulator + currentValue.len, 0))) {
-      state.stock[stockIndex].cuts.push(cut);
+      stock.cuts.push(cut);
       cut.done = true;
     } else {
       console.debug(`Can't fit cut ${cut.id} into stock ${stock.id}. Bailing out...`);
@@ -60,16 +59,16 @@ export const Algo = () => {
 
     }
 
-    for (let i = 0; i < state.stock.length; i++) {
-      //console.debug(`Calling optimize with: stock index = ${i}`);
-      createSolution(state, i);
+    for (const stock of state.stock) {
+      //console.debug(`Calling optimize with: stock.id = ${stock.id}`);
+      createSolution(state, stock.id);
     }
     //console.groupEnd();
   };
 
-  for (let i = 0; i < originalState.stock.length; i++) {
-    //console.debug(`Calling optimize with: stock index = ${i}`);
-    createSolution(originalState, i);
+  for (const stock of originalState.stock) {
+    //console.debug(`Calling optimize with: stock.id ${stock.id}`);
+    createSolution(originalState, stock.id);
   }
 
   return <></>;
