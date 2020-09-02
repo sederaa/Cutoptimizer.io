@@ -116,7 +116,7 @@ export const Algo = () => {
     //console.debug(`Calling optimize with: stock.id ${stock.id}`);
     createSolution(originalState, stock.id);
   }
-
+  
   return <></>;
 }
 
@@ -128,8 +128,7 @@ export const Algo = () => {
 //   return Math.random() * (max - min) + min;
 // }
 
-/*
-TODO:
-- Handle buying stock where needed
 
-*/
+
+
+
