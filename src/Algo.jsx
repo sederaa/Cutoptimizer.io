@@ -3,35 +3,35 @@ import clone from 'rfdc';
 
 export const Algo = () => {
 
-  // Non-obvious solution, where all cuts are taken from 2nd stock piece. trips up most other optimizers.
+  // Non-obvious solution, where all segments are taken from 2nd stock piece. trips up most other optimizers.
   // let originalState = {
-  //   cuts: [
+  //   segments: [
   //     { id: 0, len: 16, done: false },
   //     { id: 1, len: 16, done: false },
   //     { id: 2, len: 16, done: false },
   //     { id: 3, len: 16, done: false }
   //   ],
   //   stock: [
-  //     { id: 0, len: 63, cuts: [] },
-  //     { id: 1, len: 64, cuts: [] }
+  //     { id: 0, len: 63, segments: [] },
+  //     { id: 1, len: 64, segments: [] }
   //   ]
   // };
 
 
   let originalState = {
-    cuts: [
+    segments: [
       { id: 0, len: 16, done: false },
       { id: 1, len: 16, done: false },
       { id: 2, len: 16, done: false },
       { id: 3, len: 16, done: false }
     ],
     stock: [
-      { id: 0, len: 15, cuts: [], price: 0 },
-      { id: 1, len: 18, cuts: [], price: 0 }
+      { id: 0, len: 15, segments: [], price: 0 },
+      { id: 1, len: 18, segments: [], price: 0 }
     ],
     buyableStock: [
-      { id: 2, len: 15, cuts: [], price: 1.23 },
-      { id: 3, len: 20, cuts: [], price: 2.34 },
+      { id: 2, len: 15, segments: [], price: 1.23 },
+      { id: 3, len: 20, segments: [], price: 2.34 },
     ]
   };
 
@@ -40,7 +40,7 @@ export const Algo = () => {
   console.debug(`Starting state: `, originalState);
 
   const addTotalsToSolution = (stateArg) => {
-    stateArg.stock.forEach(s => s.used = s.cuts.reduce((accumulator2, currentValue2) => accumulator2 + currentValue2.len, 0));
+    stateArg.stock.forEach(s => s.used = s.segments.reduce((accumulator2, currentValue2) => accumulator2 + currentValue2.len, 0));
     stateArg.stock.forEach(s => s.waste = s.len - s.used);
     stateArg.wasteTotal = stateArg.stock.reduce((accumulator, currentValue) => accumulator + currentValue.waste, 0);
     stateArg.wastePieces = stateArg.stock.reduce((accumulator, currentValue) => accumulator + (currentValue.waste > 0 ? 1 : 0), 0);
@@ -52,9 +52,9 @@ export const Algo = () => {
     //console.group(`optimize: stockId = ${stockId}.`)
     let state = clone()(stateArg);
     //console.debug(`optimize: stateArg = `, state, `, stockId = ${stockId}.`);
-    let cut = state.cuts.find(c => !c.done);
+    let segment = state.segments.find(c => !c.done);
 
-    //console.debug(`Cut to fit: `, cut);
+    //console.debug(`segment to fit: `, segment);
     let stock = state.stock.find(s => s.id === stockId);
     let buyableStock = state.buyableStock.find(s => s.id === stockId);
     if (buyableStock){
@@ -64,15 +64,15 @@ export const Algo = () => {
     }
 
     state.path = state.path || "";
-    state.path += ` (cut=${cut.id},stock=${stock.id})`;
+    state.path += ` (segment=${segment.id},stock=${stock.id})`;
 
-    if (cut.len <= (stock.len - stock.cuts.reduce((accumulator, currentValue) => accumulator + currentValue.len, 0))) {
-      stock.cuts.push(cut);
-      cut.done = true;
-    } else if (state.buyableStock.some(bs => bs.len >= cut.len)) {
-      //console.debug(`Can't fit cut ${cut.id} into stock ${stock.id}, but there is buyable stock that would fit.`);
+    if (segment.len <= (stock.len - stock.segments.reduce((accumulator, currentValue) => accumulator + currentValue.len, 0))) {
+      stock.segments.push(segment);
+      segment.done = true;
+    } else if (state.buyableStock.some(bs => bs.len >= segment.len)) {
+      //console.debug(`Can't fit segment ${segment.id} into stock ${stock.id}, but there is buyable stock that would fit.`);
   
-      for (const buyableStock of state.buyableStock.filter(bs => bs.len >= cut.len)) {
+      for (const buyableStock of state.buyableStock.filter(bs => bs.len >= segment.len)) {
         //console.debug(`Would call createSolution with id ${buyableStock.id}. state = `, state);
         createSolution(state, buyableStock.id);
       }
@@ -80,12 +80,12 @@ export const Algo = () => {
       return;
   
     } else {
-      //console.debug(`Can't fit cut ${cut.id} into stock ${stock.id}. Bailing out...`);
+      //console.debug(`Can't fit segment ${segment.id} into stock ${stock.id}. Bailing out...`);
       //console.groupEnd();
       return;
     }
 
-    if (state.cuts.every(c => c.done)) {
+    if (state.segments.every(c => c.done)) {
       console.info(`Solution: `, addTotalsToSolution(state));
       //console.groupEnd();
       return;
