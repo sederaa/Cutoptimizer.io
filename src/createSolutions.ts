@@ -24,7 +24,7 @@ export class Stock {
     quantity: number = 1;
     price: number = 0;
     name!: string;
-    _id!: number;    
+    _id!: number;
     _segments: Segment[] = new Array<Segment>();
     _used!: number;
     _waste!: number;
@@ -44,11 +44,18 @@ export class Solution {
     cost!: number;
 }
 
+class State {
+    segments!: Segment[];
+    stock!: Stock[];
+}
+
 export const createSolutions = ({ segments, stock, buyableStocks, kerf }: CreateSolutionsProps): Solution[] => {
-    let originalState = stock.flatMap(s => new Array(s.quantity).map(_ => s));
-    originalState.forEach((value, index) => value._id = index+1);
-    let workingSegments = segments.flatMap(s => new Array(s.quantity).map(_ => s));
-    workingSegments.forEach((value, index) => value._id = index+1);
+    //console.debug(`createSolutions: segments = `, segments, `, stock = `, stock, `, buyableStocks = `, buyableStocks, `, kerf = ${kerf}.`);
+    let originalState = new State();
+    originalState.stock = stock.flatMap(s => Array.from({ length: s.quantity }, () => ({ ...s, _segments: new Array<Segment>() } as Stock))).map((s, i) => ({ ...s, _id: i + 1 }));
+    originalState.segments = segments.flatMap(s => Array.from({ length: s.quantity ?? 1 }, () => ({ ...s } as Segment))).map((s, i) => ({ ...s, _id: i + 1 }));
+
+    console.debug(`createSolutions: originalState = `, originalState);
 
     let solutions = new Array<Solution>();
 
@@ -63,34 +70,35 @@ export const createSolutions = ({ segments, stock, buyableStocks, kerf }: Create
         return solution;
     }
 
-    const createSolution = (stateArg: Stock[], stockId: number) => {
-        //console.group(`optimize: stockId = ${stockId}.`)
+    const createSolution = (stateArg: State, stockId: number, callCount: number) => {
+        if (callCount > originalState.segments.length) {
+            throw new Error(`Call count is ${callCount}. Bailing out...`);
+            return;
+        }
+
+        //console.group(`createSolution: stockId = ${stockId}, callCount = ${callCount}.`)
         let state = clone()(stateArg);
-        //console.debug(`optimize: stateArg = `, state, `, stockId = ${stockId}.`);
-        //log(state,`createSolution: start.`);
-        //log(state,`stockId = ${stockId}.`);
-        let segment = workingSegments.find(c => !c._done);
+        //console.debug(`createSolution: state = `, state, `, stockId = ${stockId}, segments = `, segments);
+        let segment = state.segments.find(c => !c._done);
         if (!segment) {
-            const solution = addTotalsToSolution(state);
+            const solution = addTotalsToSolution(state.stock);
             solutions.push(solution);
-            console.info(`Solution: `, solution);
+            //console.info(`SOLUTION: `, solution);
             //console.groupEnd();
             return;
         }
 
-        //log(state,`segmentId = ${segment.id} (len = ${segment.len}, done = ${segment.done}).`);
         //console.debug(`segment to fit: `, segment);
-        let stock = state.find(s => s._id === stockId);
+        let stock = state.stock.find(s => s._id === stockId);
         if (!stock) {
             let buyableStock = buyableStocks.find(s => s.id === stockId);
             if (buyableStock) {
                 //console.debug(`Found buyable stock ${buyableStock.id}, cloning and adding to stock...`);
                 stock = { ...buyableStock } as Stock;
-                stock._id = state.reduce((highest, currentValue) => highest = Math.max(highest, currentValue._id), 0) + 1;
-                state.push(stock);
-                //log(state,`added buyable stock with new id = ${stock.id}.`);
+                stock._id = state.stock.reduce((highest, currentValue) => highest = Math.max(highest, currentValue._id), 0) + 1;
+                state.stock.push(stock);
+                //console.debug(`added buyable stock with new id = ${stock.id}.`);
             }
-            //log(state,`stock.id = ${stock.id} (len = ${stock.len}).`);
         }
         if (!stock) {
             throw new Error(`Couldn't find stock for id ${stockId}`);
@@ -99,8 +107,8 @@ export const createSolutions = ({ segments, stock, buyableStocks, kerf }: Create
         //state.path = state.path || "";
         //state.path += ` (segment=${segment.id},stock=${stock.id})`;
         let segmentLength = segment.length;
-        if (segmentLength <= (stock.length - workingSegments.reduce((accumulator, currentValue) => accumulator + currentValue.length, 0))) {
-            //log(state,`segment fits stock, adding segment to stock.segments list and setting done...`);
+        if (segmentLength <= (stock.length - stock._segments.reduce((accumulator, currentValue) => accumulator + currentValue.length, 0))) {
+            //console.debug(`segment fits stock, adding segment to stock.segments list and setting done...`);
             stock._segments.push(segment);
             segment._done = true;
             if (kerf > 0 && stock.length > stock._segments.reduce((accumulator, currentValue) => accumulator + currentValue.length, 0)) {
@@ -108,31 +116,38 @@ export const createSolutions = ({ segments, stock, buyableStocks, kerf }: Create
             }
 
         } else if (buyableStocks.some(bs => bs.length >= segmentLength)) {
-            //console.debug(`Can't fit segment ${segment.id} into stock ${stock.id}, but there is buyable stock that would fit.`);
-            //log(state,`segment doesn't fit stock, but fits some buyable stock, looping through buyable stock...`);
+            //console.debug(`Can't fit segment ${segment._id} into stock ${stock._id}, but there is buyable stock that would fit.`);
             for (const buyableStock of buyableStocks.filter(bs => bs.length >= segmentLength)) {
                 //console.debug(`Would call createSolution with id ${buyableStock.id}. state = `, state);
-                //log(state,`calling createSolution with buyableStock.id ${buyableStock.id}...`);
-                createSolution(state, buyableStock.id);
+                createSolution(state, buyableStock.id, callCount + 1);
             }
             return;
 
         } else {
-            //console.debug(`Can't fit segment ${segment.id} into stock ${stock.id}. Bailing out...`);
+            //console.debug(`Can't fit segment ${segment._id} into stock ${stock._id}. Bailing out...`);
             //console.groupEnd();
             return;
         }
 
-        for (const stock of state) {
-            //console.debug(`Calling optimize with: stock.id = ${stock.id}`);
-            createSolution(state, stock._id);
+        let segmentsAllAllocated = state.segments.every(s => s._done);
+        if (segmentsAllAllocated) {
+            const solution = addTotalsToSolution(state.stock);
+            solutions.push(solution);
+            //console.info(`SOLUTION: `, solution);
+            //console.groupEnd();
+            return;
+        } else {
+            for (const stock of state.stock) {
+                //console.debug(`Calling createSolution with: stock._id = ${stock._id}`);
+                createSolution(state, stock._id, callCount + 1);
+            }
         }
         //console.groupEnd();
     };
 
-    for (const stock of originalState) {
-        //console.debug(`Calling optimize with: stock.id ${stock.id}`);
-        createSolution(originalState, stock._id);
+    for (const stock of originalState.stock) {
+        //console.debug(`Calling optimize with: stock._id ${stock._id}`);
+        createSolution(originalState, stock._id, 1);
     }
 
     return solutions;
