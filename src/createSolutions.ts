@@ -42,11 +42,13 @@ export class Solution {
     wasteTotal!: number;
     wastePieces!: number;
     cost!: number;
+    _path!: string;
 }
 
 class State {
     segments!: Segment[];
     stock!: Stock[];
+    _path!: string;
 }
 
 export const createSolutions = ({ segments, stock, buyableStocks, kerf }: CreateSolutionsProps): Solution[] => {
@@ -59,14 +61,15 @@ export const createSolutions = ({ segments, stock, buyableStocks, kerf }: Create
 
     let solutions = new Array<Solution>();
 
-    const addTotalsToSolution = (stateArg: Stock[]): Solution => {
+    const mapToSolutionObject = (state: State): Solution => {
         let solution = new Solution();
-        solution.stock = stateArg;
+        solution._path = state._path;
+        solution.stock = state.stock;
         solution.stock.forEach(s => s._used = s._segments.reduce((accumulator2, currentValue2) => accumulator2 + currentValue2.length, 0));
         solution.stock.forEach(s => s._waste = s.length - s._used);
-        solution.wasteTotal = stateArg.reduce((accumulator, currentValue) => accumulator + currentValue._waste, 0);
-        solution.wastePieces = stateArg.reduce((accumulator, currentValue) => accumulator + (currentValue._waste > 0 ? 1 : 0), 0);
-        solution.cost = stateArg.reduce((accumulator, currentValue) => accumulator + currentValue.price, 0);
+        solution.wasteTotal = state.stock.reduce((accumulator, currentValue) => accumulator + currentValue._waste, 0);
+        solution.wastePieces = state.stock.reduce((accumulator, currentValue) => accumulator + (currentValue._waste > 0 ? 1 : 0), 0);
+        solution.cost = state.stock.reduce((accumulator, currentValue) => accumulator + currentValue.price, 0);
         return solution;
     }
 
@@ -81,7 +84,7 @@ export const createSolutions = ({ segments, stock, buyableStocks, kerf }: Create
         //console.debug(`createSolution: state = `, state, `, stockId = ${stockId}, segments = `, segments);
         let segment = state.segments.find(c => !c._done);
         if (!segment) {
-            const solution = addTotalsToSolution(state.stock);
+            const solution = mapToSolutionObject(state);
             solutions.push(solution);
             //console.info(`SOLUTION: `, solution);
             //console.groupEnd();
@@ -104,8 +107,8 @@ export const createSolutions = ({ segments, stock, buyableStocks, kerf }: Create
             throw new Error(`Couldn't find stock for id ${stockId}`);
         }
 
-        //state.path = state.path || "";
-        //state.path += ` (segment=${segment.id},stock=${stock.id})`;
+        state._path = state._path || "";
+        state._path += ` (segment=${segment.id},stock=${stock.id})`;
         let segmentLength = segment.length;
         if (segmentLength <= (stock.length - stock._segments.reduce((accumulator, currentValue) => accumulator + currentValue.length, 0))) {
             //console.debug(`segment fits stock, adding segment to stock.segments list and setting done...`);
@@ -131,7 +134,8 @@ export const createSolutions = ({ segments, stock, buyableStocks, kerf }: Create
 
         let segmentsAllAllocated = state.segments.every(s => s._done);
         if (segmentsAllAllocated) {
-            const solution = addTotalsToSolution(state.stock);
+            const solution = mapToSolutionObject(state);
+
             solutions.push(solution);
             //console.info(`SOLUTION: `, solution);
             //console.groupEnd();
