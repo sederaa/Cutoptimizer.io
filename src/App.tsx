@@ -7,7 +7,8 @@ import {Tagline} from './Tagline';
 import {InputSection} from './InputSection';
 import {CutList} from './CutList';
 import styled from 'styled-components';
-import { createSolutions, CreateSolutionsProps, Segment, Stock, BuyableStock } from './createSolutions';
+//import { createSolutions, CreateSolutionsProps, Segment, Stock, BuyableStock } from './createSolutions';
+import { createSolutionsByTree, CreateSolutionsProps, Segment, Stock, BuyableStock } from './createSolutionsTree';
 
 
 const StyledApp = styled.div`
@@ -31,37 +32,38 @@ const App = () => {
 
   let props = {
     segments: [
-      { id: 1, length: 5, quantity: 1 } as Segment,
+      { id: 5, length: 5, quantity: 1 } as Segment,
+      { id: 4, length: 10, quantity: 1 } as Segment,
+      { id: 3, length: 10, quantity: 1 } as Segment,
       { id: 2, length: 5, quantity: 1 } as Segment,
+      { id: 1, length: 5, quantity: 1 } as Segment,
       /*
-      { id: 3, length: 5, quantity: 1 } as Segment,
-      { id: 4, length: 5, quantity: 1 } as Segment,
       { id: 5, length: 5, quantity: 1 } as Segment,
       { id: 0, length: 5, quantity: 2 } as Segment,
       */
     ],
     stock: [
-      { id: 1, length: 20, price: 0, quantity: 1 } as Stock,
-      { id: 2, length: 10, price: 0, quantity: 1 } as Stock,
+      { id: 1, length: 10, price: 0, quantity: 5 } as Stock,
       /*
+      { id: 2, length: 20, price: 0, quantity: 1 } as Stock,
       { id: 0, length: 20, price: 0, quantity: 2 } as Stock,
       { id: 1, length: 40, price: 0, quantity: 1 } as Stock*/
     ],
     buyableStocks: [
-      /*
       { id: 1001, length: 15, price: 1.23 } as BuyableStock,
+      /*
       { id: 1002, length: 20, price: 2.34 } as BuyableStock,
       */
     ],
     kerf: 0
   } as CreateSolutionsProps;
 
-const solutions = createSolutions(props);
+const solutions = createSolutionsByTree(props);
 console.debug(`SOLUTIONS: `, solutions);
 
-solutions.forEach(s=>console.debug(s._path));
+//solutions.forEach(s=>console.debug(s._path));
 
-  return (
+return (
     <StyledApp>
       <Header />
       <Tagline />
