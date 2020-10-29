@@ -3,7 +3,7 @@ import clone from 'rfdc';
 
 export interface CreateSolutionsProps {
     segments: Segment[],
-    stock: Stock[],
+    stocks: Stock[],
     buyableStocks: BuyableStock[],
     kerf: number
 }
@@ -46,13 +46,7 @@ export class Solution {
     cost!: number;
     _path!: string;
 }
-/*
-class State {
-    segments!: Segment[];
-    stock!: Stock[];
-    _path!: string;
-}
-*/
+
 class Node {
     segment!: Segment;
     stock!: Stock;
@@ -67,12 +61,15 @@ const findStockItemInParents = (node: Node, stockId: number): Stock | undefined 
     return findStockItemInParents(node.parent, stockId);
 }
 
-export const createSolutionsByTree = ({ segments, stock: stocks, buyableStocks, kerf }: CreateSolutionsProps) /*: Solution[]*/ => {
+export const createSolutionsByTree = ({ segments, stocks, buyableStocks, kerf }: CreateSolutionsProps) /*: Solution[]*/ => {
     //console.debug(`createSolutions: segments = `, segments, `, stock = `, stock, `, buyableStocks = `, buyableStocks, `, kerf = ${kerf}.`);
 
-    //TODO: sort segments by length ascending
+    // sort segments by length ascending
+    segments.sort((s1, s2) => s1.length === s2.length ? 0 : (s1.length < s2.length ? 1 : -1));
 
-    stocks = stocks.map(s => ({ ...s, _remainingLength: s.length, _remainingQuantity: s.quantity } as Stock));
+    stocks = stocks.map(s => ({ ...s, _remainingLength: s.length, _remainingQuantity: s.quantity } as Stock))
+    const buyableStocksTemp = buyableStocks.map(bs=>({...bs, _remainingLength: bs.length, _remainingQuantity: Number.POSITIVE_INFINITY} as Stock));
+    Array.prototype.push.apply(stocks, buyableStocksTemp);
 
     const root = new Node();
 
@@ -99,20 +96,8 @@ export const createSolutionsByTree = ({ segments, stock: stocks, buyableStocks, 
                 buildTree(newNode, segmentIndex - 1);
             }
         }
-        /*
-                // loop through buyableStocks in the same way as stock
-                for (const stock of stocks) {
-                    // get this stock item from further up the chain, otherwise use stock
-                    const stockItem = findStockItemInParents(node, stock.id) ?? stock;
-                    // create node if it fits
-                    if (segment.length <= stockItem._remainingLength) {
-                        const clonedStockItem = { ...stockItem, _remainingLength: stockItem._remainingLength - segment.length } as Stock;
-                        const newNode = { stock: clonedStockItem, segment: segment, parent: node, children: [] } as Node;
-                        node.children.push(newNode);
-                        buildTree(newNode, segmentIndex - 1);
-                    }
-                }
-        */
+
+
     }
 
     buildTree(root, segments.length - 1);

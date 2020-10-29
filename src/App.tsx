@@ -35,19 +35,21 @@ const App = () => {
       { id: 5, length: 5, quantity: 1 } as Segment,
       { id: 4, length: 10, quantity: 1 } as Segment,
       { id: 3, length: 10, quantity: 1 } as Segment,
+      /*
       { id: 2, length: 5, quantity: 1 } as Segment,
       { id: 1, length: 5, quantity: 1 } as Segment,
+      */
       /*
       { id: 5, length: 5, quantity: 1 } as Segment,
       { id: 0, length: 5, quantity: 2 } as Segment,
       */
     ],
-    stock: [
-      { id: 1, length: 10, price: 0, quantity: 5 } as Stock,
-      /*
-      { id: 2, length: 20, price: 0, quantity: 1 } as Stock,
-      { id: 0, length: 20, price: 0, quantity: 2 } as Stock,
-      { id: 1, length: 40, price: 0, quantity: 1 } as Stock*/
+    stocks: [
+      /*{ id: 1, length: 10, price: 0, quantity: 5 } as Stock,*/
+
+      //{ id: 2, length: 10, price: 0, quantity: 1 } as Stock,
+      /*{ id: 0, length: 20, price: 0, quantity: 2 } as Stock,*/
+      //{ id: 1, length: 20, price: 0, quantity: 1 } as Stock
     ],
     buyableStocks: [
       { id: 1001, length: 15, price: 1.23 } as BuyableStock,
