@@ -47,9 +47,9 @@ const App = () => {
     stocks: [
       /*{ id: 1, length: 10, price: 0, quantity: 5 } as Stock,*/
 
-      //{ id: 2, length: 10, price: 0, quantity: 1 } as Stock,
+      { id: 2, length: 10, price: 0, quantity: 1 } as Stock,
       /*{ id: 0, length: 20, price: 0, quantity: 2 } as Stock,*/
-      //{ id: 1, length: 20, price: 0, quantity: 1 } as Stock
+      { id: 1, length: 20, price: 0, quantity: 1 } as Stock
     ],
     buyableStocks: [
       { id: 1001, length: 15, price: 1.23 } as BuyableStock,
@@ -57,7 +57,7 @@ const App = () => {
       { id: 1002, length: 20, price: 2.34 } as BuyableStock,
       */
     ],
-    kerf: 0
+    kerf: 1
   } as CreateSolutionsProps;
 
 const solutions = createSolutionsByTree(props);
