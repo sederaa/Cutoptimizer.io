@@ -57,7 +57,6 @@ export const ListMachine = Machine<ListContext, ListSchema, ListEvent>({
                     target: ListStates.Adding,
                 },
                 [ListEvents.Delete]: {
-                    cond: (context, event) => context.items.length > 1,
                     target: ListStates.Deleting,
                 },
                 [ListEvents.UpdateField]: {
@@ -70,7 +69,7 @@ export const ListMachine = Machine<ListContext, ListSchema, ListEvent>({
                 items: (context, event: UpdateFieldEvent) => [
                     ...context.items.filter(i => i.id !== event.id),
                     ({ ...context.items.find(i => i.id === event.id), [event.name]: event.value } as ListItemData)
-                ]
+                ].sort(i => i.id)
             }),
             always: ListStates.Idle
         },
@@ -79,7 +78,7 @@ export const ListMachine = Machine<ListContext, ListSchema, ListEvent>({
                 assign({
                     items: (context, event) => ([...context.items.filter(i => i.id !== (event as DeleteEvent).id)])
                 }),
-                assign({ items: (context, event) => (context.items.length > 1 ? context.items : [makeEmptyListItemData(0)]) })
+                assign({ items: (context, event) => (context.items.length > 0 ? context.items : [makeEmptyListItemData(0)]) })
             ],
             always: ListStates.Idle
         },

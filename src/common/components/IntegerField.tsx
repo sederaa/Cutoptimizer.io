@@ -5,11 +5,11 @@ interface IntegerFieldProps {
     value: string|number,
     min?: number,
     max?: number,
+    placeholder?:string,
     onChange: (value: number | "") => void
-
 }
 
-export const IntegerField = ({ name, value, min, max, onChange }: IntegerFieldProps) => {
+export const IntegerField = ({ name, value, min, max, placeholder, onChange }: IntegerFieldProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.value === "")
             onChange("");
@@ -22,5 +22,5 @@ export const IntegerField = ({ name, value, min, max, onChange }: IntegerFieldPr
         onChange(numericValue);
 
     }
-    return <input type="text" name={name} value={value} onChange={handleChange} />;
+    return <input type="text" name={name} value={value} onChange={handleChange} placeholder={placeholder} />;
 }

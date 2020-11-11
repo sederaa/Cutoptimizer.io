@@ -6,7 +6,7 @@ import { IntegerField } from './common/components/IntegerField';
 
 export const List = () => {
     const [state, sendEvent] = useMachine(ListMachine);
-    //console.debug(`state = `, state);
+    //console.debug(`state.context.items = `, state.context.items);
 
     const handleAddClick = () => {
         sendEvent(ListEvents.Add);
@@ -37,9 +37,9 @@ interface ListItemProps {
 export const ListItem = ({ data, handleDeleteItem, handleUpdateField }: ListItemProps) => {
     return <li>
         {data.id}.
-        <input type="text" name="name" value={data.name} onChange={(e) => handleUpdateField(data.id, "name", e.target.value)} />
-        <IntegerField name="length" value={data.length} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "length", value.toString())} />
-        <IntegerField name="quantity" value={data.quantity} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "quantity", value.toString())} />
+        <input type="text" name="name" value={data.name} onChange={(e) => handleUpdateField(data.id, "name", e.target.value)} placeholder="Name" />
+        <IntegerField name="length" placeholder="Length" value={data.length} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "length", value.toString())} />
+        <IntegerField name="quantity" placeholder="Quantity" value={data.quantity} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "quantity", value.toString())} />
         <button onClick={() => handleDeleteItem(data.id)}>x</button>
     </li>;
 }
