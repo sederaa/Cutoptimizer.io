@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useMachine } from '@xstate/react';
-import { ListMachine, ListEvents, ListItemData, UpdateFieldEvent } from './ListMachine';
-import { IntegerField } from './common/components/IntegerField';
+import { ListMachine, ListEvents, ListItemData, UpdateFieldEvent } from 'common/components/ListMachine';
+import { IntegerField } from 'common/components/IntegerField';
 
 export const List = () => {
     const [state, sendEvent] = useMachine(ListMachine);

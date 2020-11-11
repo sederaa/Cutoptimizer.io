@@ -2,13 +2,13 @@ import React from 'react';
 import 'sanitize.css';
 import 'sanitize.css/forms.css';
 import 'sanitize.css/typography.css';
-import {Header} from './Header';
-import {Tagline} from './Tagline';
-import {InputSection} from './InputSection';
-import {CutList} from './CutList';
+import { Header } from 'main/components/Header';
+import { Tagline } from 'main/components/Tagline';
+import { InputSection } from 'main/components/InputSection';
+import { CutList } from 'main/components/CutList';
 import styled from 'styled-components';
 //import { createSolutions, CreateSolutionsProps, Segment, Stock, BuyableStock } from './createSolutions';
-import { createSolutionsByTree, CreateSolutionsProps, Segment, Stock, BuyableStock } from './createSolutionsTree';
+import { createSolutionsByTree, CreateSolutionsProps, Segment, Stock, BuyableStock } from 'main/services/createSolutionsTree';
 
 
 const StyledApp = styled.div`
@@ -52,12 +52,12 @@ const App = () => {
     kerf: 1
   } as CreateSolutionsProps;
 
-const solutions = createSolutionsByTree(props);
-console.debug(`SOLUTIONS: `, solutions);
+  const solutions = createSolutionsByTree(props);
+  console.debug(`SOLUTIONS: `, solutions);
 
-//solutions.forEach(s=>console.debug(s._path));
+  //solutions.forEach(s=>console.debug(s._path));
 
-return (
+  return (
     <StyledApp>
       <Header />
       <Tagline />
