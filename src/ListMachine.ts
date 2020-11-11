@@ -36,10 +36,10 @@ type ListEvent = { type: ListEvents.Add } | DeleteEvent | UpdateFieldEvent;
 export interface ListItemData {
     id: number,
     name: string,
-    length: number,
-    quantity: number
+    length: number | "",
+    quantity: number | ""
 }
-const makeEmptyListItemData = (id: number) => ({ id, name: "", length: 0, quantity: 1 } as ListItemData);
+const makeEmptyListItemData = (id: number) => ({ id, name: "", length: "", quantity: 1 } as ListItemData);
 
 interface ListContext {
     items: ListItemData[],

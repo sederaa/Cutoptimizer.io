@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useMachine } from '@xstate/react';
-import { Machine, assign } from 'xstate';
-import {ListMachine, ListEvents, ListItemData, UpdateFieldEvent} from './ListMachine';
+import { ListMachine, ListEvents, ListItemData, UpdateFieldEvent } from './ListMachine';
+import { IntegerField } from './common/components/IntegerField';
 
 export const List = () => {
     const [state, sendEvent] = useMachine(ListMachine);
+    //console.debug(`state = `, state);
 
     const handleAddClick = () => {
         sendEvent(ListEvents.Add);
@@ -37,8 +38,8 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField }: ListItem
     return <li>
         {data.id}.
         <input type="text" name="name" value={data.name} onChange={(e) => handleUpdateField(data.id, "name", e.target.value)} />
-        <input type="number" name="length" value={data.length} onChange={(e) => Number.isInteger(Number.parseInt(e.target.value)) ? handleUpdateField(data.id, "length", e.target.value) : null} />
-        <input type="number" name="quantity" value={data.quantity} onChange={(e) => Number.isInteger(Number.parseInt(e.target.value)) ? handleUpdateField(data.id, "quantity", e.target.value) : null} />
+        <IntegerField name="length" value={data.length} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "length", value.toString())} />
+        <IntegerField name="quantity" value={data.quantity} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "quantity", value.toString())} />
         <button onClick={() => handleDeleteItem(data.id)}>x</button>
     </li>;
 }
