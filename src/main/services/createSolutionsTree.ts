@@ -8,14 +8,11 @@ export interface CreateSolutionsProps {
     kerf: number;
 }
 
-export class Segment {
-    id!: number;
-    length!: number;
-    quantity: number | undefined = 1;
-    name!: string;
-    //_id!: number;
-    //_done: boolean = false;
-    //_type: "kerf" | "user" = "user";
+export interface Segment {
+    id: number;
+    length: number;
+    quantity: number | null;
+    name: string;
 }
 
 export class Stock {
@@ -27,10 +24,6 @@ export class Stock {
     _remainingLength!: number;
     _remainingQuantity!: number;
     _totalKerf: number = 0;
-    //_id!: number;
-    //_segments: Segment[] = new Array<Segment>();
-    //_used!: number;
-    //_waste!: number;
 }
 
 export class BuyableStock {

@@ -1,11 +1,16 @@
 import React from "react";
 import styled from "styled-components";
 import { useMachine } from "@xstate/react";
-import { ListMachine, ListEvents, ListItemData, UpdateFieldEvent } from "common/components/ListMachine";
+import { ListMachine, ListEvents, UpdateFieldEvent } from "common/components/ListMachine";
+import { ListItemModel } from "common/models/ListItemModel";
 import { IntegerField } from "common/components/IntegerField";
 
-export const List = () => {
-    const [state, sendEvent] = useMachine(ListMachine);
+interface ListProps {
+    onItemsChanged: (items: ListItemModel[]) => void;
+}
+
+export const List = ({ onItemsChanged }: ListProps) => {
+    const [state, sendEvent] = useMachine(ListMachine, { context: { onItemsChanged } });
     //console.debug(`state.context.items = `, state.context.items);
 
     const handleAddClick = () => {
@@ -16,7 +21,7 @@ export const List = () => {
         sendEvent({ type: ListEvents.Delete, id });
     };
 
-    const handleUpdateField = (id: number, name: keyof Omit<ListItemData, "id">, value: string) => {
+    const handleUpdateField = (id: number, name: keyof Omit<ListItemModel, "id">, value: string) => {
         sendEvent({
             type: ListEvents.UpdateField,
             id,
@@ -38,9 +43,9 @@ export const List = () => {
 };
 
 interface ListItemProps {
-    data: ListItemData;
+    data: ListItemModel;
     handleDeleteItem: (id: number) => void;
-    handleUpdateField: (id: number, name: keyof Omit<ListItemData, "id">, value: string) => void;
+    handleUpdateField: (id: number, name: keyof Omit<ListItemModel, "id">, value: string) => void;
 }
 
 export const ListItem = ({ data, handleDeleteItem, handleUpdateField }: ListItemProps) => {
@@ -48,8 +53,8 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField }: ListItem
         <li>
             {data.id}.
             <input type="text" name="name" value={data.name} onChange={(e) => handleUpdateField(data.id, "name", e.target.value)} placeholder="Name" />
-            <IntegerField name="length" placeholder="Length" value={data.length} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "length", value.toString())} />
-            <IntegerField name="quantity" placeholder="Quantity" value={data.quantity} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "quantity", value.toString())} />
+            <IntegerField name="length" placeholder="Length" value={data.length ?? ""} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "length", value?.toString() ?? "")} />
+            <IntegerField name="quantity" placeholder="Quantity" value={data.quantity ?? ""} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "quantity", value?.toString() ?? "")} />
             <button onClick={() => handleDeleteItem(data.id)}>x</button>
         </li>
     );

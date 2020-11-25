@@ -6,12 +6,12 @@ interface IntegerFieldProps {
     min?: number;
     max?: number;
     placeholder?: string;
-    onChange: (value: number | "") => void;
+    onChange: (value: number | null) => void;
 }
 
 export const IntegerField = ({ name, value, min, max, placeholder, onChange }: IntegerFieldProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.value === "") onChange("");
+        if (e.target.value === "") onChange(null);
         const isNumber = /^\d+$/.test(e.target.value);
         //console.debug(`handleNumericFieldChange: e.target.value = ${e.target.value}, numericValue = ${numericValue}, isNumber = ${isNumber}.`);
         if (!isNumber) return;
