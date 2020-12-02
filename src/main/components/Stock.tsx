@@ -17,7 +17,7 @@ export const Stock = ({ stock, onStockChanged }: StockProps) => {
         <StyledStock>
             <h1>Stock</h1>
             Enter your Stock here
-            <List onItemsChanged={handleItemsChanged} />
+            <List items={stock} onItemsChanged={handleItemsChanged} />
         </StyledStock>
     );
 };

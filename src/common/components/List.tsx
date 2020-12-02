@@ -1,24 +1,25 @@
 import React from "react";
 import styled from "styled-components";
 import { useMachine } from "@xstate/react";
-import { ListMachine, ListEvents, UpdateFieldEvent } from "common/components/ListMachine";
+import { ListMachine, ListEvents, UpdateFieldEvent, AddEvent, DeleteEvent } from "common/components/ListMachine";
 import { ListItemModel } from "common/models/ListItemModel";
 import { IntegerField } from "common/components/IntegerField";
 
 interface ListProps {
+    items: ListItemModel[];
     onItemsChanged: (items: ListItemModel[]) => void;
 }
 
-export const List = ({ onItemsChanged }: ListProps) => {
+export const List = ({ items, onItemsChanged }: ListProps) => {
     const [state, sendEvent] = useMachine(ListMachine, { context: { onItemsChanged } });
     //console.debug(`state.context.items = `, state.context.items);
 
     const handleAddClick = () => {
-        sendEvent(ListEvents.Add);
+        sendEvent({ type: ListEvents.Add, items } as AddEvent);
     };
 
     const handleDeleteItem = (id: number) => {
-        sendEvent({ type: ListEvents.Delete, id });
+        sendEvent({ type: ListEvents.Delete, items, id } as DeleteEvent);
     };
 
     const handleUpdateField = (id: number, name: keyof Omit<ListItemModel, "id">, value: string) => {
@@ -27,13 +28,14 @@ export const List = ({ onItemsChanged }: ListProps) => {
             id,
             name,
             value,
+            items,
         } as UpdateFieldEvent);
     };
 
     return (
         <>
             <ul>
-                {state.context.items.map((i) => (
+                {items.map((i) => (
                     <ListItem key={i.id} data={i} handleDeleteItem={handleDeleteItem} handleUpdateField={handleUpdateField} />
                 ))}
             </ul>

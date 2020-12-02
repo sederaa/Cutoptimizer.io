@@ -22,27 +22,34 @@ export enum ListEvents {
     Delete = "Delete",
     UpdateField = "UpdateField",
 }
-type DeleteEvent = {
+
+interface BaseEvent {
+    type: ListEvents;
+    items: ListItemModel[];
+}
+
+export interface DeleteEvent extends BaseEvent {
     type: ListEvents.Delete;
     id: number;
-};
-export type UpdateFieldEvent = {
+}
+export interface UpdateFieldEvent extends BaseEvent {
     type: ListEvents.UpdateField;
     id: number;
     name: keyof Omit<ListItemModel, "id">;
     value: string;
-};
-type ListEvent = { type: ListEvents.Add } | DeleteEvent | UpdateFieldEvent;
+}
+export interface AddEvent extends BaseEvent {
+    type: ListEvents.Add;
+}
+type ListEvent = AddEvent | DeleteEvent | UpdateFieldEvent;
 
 interface ListContext {
-    items: ListItemModel[];
     onItemsChanged: (items: ListItemModel[]) => void;
 }
 
 export const ListMachine = Machine<ListContext, ListSchema, ListEvent>({
     initial: ListStates.Idle,
     context: {
-        items: [makeEmptyListItemData(0)],
         onItemsChanged: (items: ListItemModel[]) => {},
     },
     states: {
@@ -60,44 +67,35 @@ export const ListMachine = Machine<ListContext, ListSchema, ListEvent>({
             },
         },
         [ListStates.UpdatingField]: {
-            entry: [
-                assign({
-                    items: (context, event: UpdateFieldEvent) =>
-                        [
-                            ...context.items.filter((i) => i.id !== event.id),
-                            {
-                                ...context.items.find((i) => i.id === event.id),
-                                [event.name]: event.value,
-                            } as ListItemModel,
-                        ].sort((i) => i.id),
-                }),
-                (context) => context.onItemsChanged(context.items),
-            ],
+            entry: (context: ListContext, event: ListEvent) => {
+                const ev = event as UpdateFieldEvent;
+                const items = [
+                    ...ev.items.filter((i) => i.id !== ev.id),
+                    {
+                        ...ev.items.find((i) => i.id === ev.id),
+                        [ev.name]: ev.value,
+                    } as ListItemModel,
+                ].sort((i) => i.id);
+                context.onItemsChanged(items);
+            },
             always: ListStates.Idle,
         },
         [ListStates.Deleting]: {
-            entry: [
-                assign({
-                    items: (context, event) => [...context.items.filter((i) => i.id !== (event as DeleteEvent).id)],
-                }),
-                assign({
-                    items: (context, event) => (context.items.length > 0 ? context.items : [makeEmptyListItemData(0)]),
-                }),
-                (context) => context.onItemsChanged(context.items),
-            ],
+            entry: (context: ListContext, event: ListEvent) => {
+                const ev = event as DeleteEvent;
+                let items = [...ev.items.filter((i) => i.id !== ev.id)];
+                if (items.length === 0) items = [makeEmptyListItemData(0)];
+                context.onItemsChanged(items);
+            },
             always: ListStates.Idle,
         },
         [ListStates.Adding]: {
-            entry: [
-                assign({
-                    items: (context, event) => {
-                        const highestExistingId = context.items.reduce((highestId, currentValue) => (currentValue.id > highestId ? currentValue.id : highestId), 0);
-                        const result = [...context.items, makeEmptyListItemData(highestExistingId + 1)];
-                        return result;
-                    },
-                }),
-                (context) => context.onItemsChanged(context.items),
-            ],
+            entry: (context: ListContext, event: ListEvent) => {
+                const ev = event as AddEvent;
+                const highestExistingId = ev.items.reduce((highestId, currentValue) => (currentValue.id > highestId ? currentValue.id : highestId), 0);
+                const result = [...ev.items, makeEmptyListItemData(highestExistingId + 1)];
+                context.onItemsChanged(result);
+            },
             always: ListStates.Idle,
         },
     },

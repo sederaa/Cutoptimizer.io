@@ -5,6 +5,7 @@ import { StockModel } from "main/models/StockModel";
 import { CutModel } from "main/models/CutModel";
 import { CreateSolutionsProps } from "main/services/CreateSolutionsProps";
 import merge from "lodash.merge";
+import { makeEmptyListItemData } from "common/models/ListItemModel";
 
 interface AppMachineContext {
     input: CreateSolutionsProps;
@@ -34,8 +35,8 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
     initial: AppMachineStates.Idle,
     context: {
         input: {
-            cuts: [] as CutModel[],
-            stocks: [] as StockModel[],
+            cuts: [makeEmptyListItemData(0)] as CutModel[],
+            stocks: [makeEmptyListItemData(0)] as StockModel[],
             buyableStocks: [] as BuyableStockModel[],
             kerf: 0,
         },

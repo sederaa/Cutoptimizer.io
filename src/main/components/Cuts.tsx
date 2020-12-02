@@ -18,7 +18,7 @@ export const Cuts = ({ cuts, onCutsChanged }: CutsProps) => {
         <StyledCuts>
             <h1>Cuts</h1>
             Enter your cuts here
-            <List onItemsChanged={handleItemsChanged} />
+            <List items={cuts} onItemsChanged={handleItemsChanged} />
         </StyledCuts>
     );
 };
