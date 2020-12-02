@@ -7,13 +7,11 @@ import { Tagline } from "main/components/Tagline";
 import { InputSection } from "main/components/InputSection";
 import { CutList } from "main/components/CutList";
 import styled from "styled-components";
-import { createSolutionsByTree } from "main/services/createSolutionsTree";
 import { BuyableStockModel } from "main/models/BuyableStockModel";
 import { StockModel } from "main/models/StockModel";
 import { CutModel } from "main/models/CutModel";
-import { CreateSolutionsProps } from "main/services/CreateSolutionsProps";
 import { useMachine } from "@xstate/react";
-import { AppMachine, AppMachineEvents, SetKerfEvent, SetCutsEvent } from "main/machines/AppMachine";
+import { AppMachine, AppMachineEvents, SetKerfEvent, SetCutsEvent, SetStockEvent } from "main/machines/AppMachine";
 
 const StyledApp = styled.div``;
 
@@ -26,15 +24,20 @@ const App = () => {
     };
 
     const handleCutsChanged = (cuts: CutModel[]) => {
-        console.debug(`App: handleCutsChanged: cuts = `, cuts);
+        //console.debug(`App: handleCutsChanged: cuts = `, cuts);
         send({ type: AppMachineEvents.SetCuts, cuts } as SetCutsEvent);
+    };
+
+    const handleStockChanged = (stock: StockModel[]) => {
+        //console.debug(`App: handleStockChanged: stock = `, stock);
+        send({ type: AppMachineEvents.SetStock, stock } as SetStockEvent);
     };
 
     return (
         <StyledApp>
             <Header />
             <Tagline />
-            <InputSection kerf={state.context.input.kerf} onKerfChanged={handleKerfChanged} cuts={state.context.input.segments} onCutsChanged={handleCutsChanged} />
+            <InputSection kerf={state.context.input.kerf} onKerfChanged={handleKerfChanged} cuts={state.context.input.cuts} onCutsChanged={handleCutsChanged} stock={state.context.input.stocks} onStockChanged={handleStockChanged} />
             <CutList />
         </StyledApp>
     );

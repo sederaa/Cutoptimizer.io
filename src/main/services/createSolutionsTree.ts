@@ -24,11 +24,11 @@ const findStockItemInParents = (node: Node, stockId: number): StockModel | undef
     return findStockItemInParents(node.parent, stockId);
 };
 
-export const createSolutionsByTree = ({ segments, stocks, buyableStocks, kerf }: CreateSolutionsProps) /*: Solution[]*/ => {
-    //console.debug(`createSolutions: segments = `, segments, `, stock = `, stock, `, buyableStocks = `, buyableStocks, `, kerf = ${kerf}.`);
+export const createSolutionsByTree = ({ cuts, stocks, buyableStocks, kerf }: CreateSolutionsProps) /*: Solution[]*/ => {
+    //console.debug(`createSolutions: cuts = `, cuts, `, stock = `, stock, `, buyableStocks = `, buyableStocks, `, kerf = ${kerf}.`);
 
     // sort segments by length ascending
-    segments.sort((s1, s2) => (s1.length === s2.length ? 0 : s1.length < s2.length ? 1 : -1));
+    cuts.sort((s1, s2) => (s1.length === s2.length ? 0 : s1.length < s2.length ? 1 : -1));
 
     stocks = stocks.map(
         (s) =>
@@ -52,7 +52,7 @@ export const createSolutionsByTree = ({ segments, stocks, buyableStocks, kerf }:
 
     const buildTree = (node: Node, segmentIndex: number) => {
         if (segmentIndex < 0) return;
-        const segment = segments[segmentIndex];
+        const segment = cuts[segmentIndex];
         node.children = node.children ?? [];
         for (const stock of stocks) {
             // get this stock item from further up the chain, otherwise use stock
@@ -118,7 +118,7 @@ export const createSolutionsByTree = ({ segments, stocks, buyableStocks, kerf }:
         }
     };
 
-    buildTree(root, segments.length - 1);
+    buildTree(root, cuts.length - 1);
 
     const printTree = (node: Node, level: number) => {
         const indent = " ".repeat(level * 3);
