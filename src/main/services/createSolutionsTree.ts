@@ -1,40 +1,9 @@
-import React from "react";
-import clone from "rfdc";
-
-export interface CreateSolutionsProps {
-    segments: Segment[];
-    stocks: Stock[];
-    buyableStocks: BuyableStock[];
-    kerf: number;
-}
-
-export interface Segment {
-    id: number;
-    length: number;
-    quantity: number | null;
-    name: string;
-}
-
-export class Stock {
-    id!: number;
-    length!: number;
-    quantity: number = 1;
-    price: number = 0;
-    name!: string;
-    _remainingLength!: number;
-    _remainingQuantity!: number;
-    _totalKerf: number = 0;
-}
-
-export class BuyableStock {
-    id!: number;
-    length!: number;
-    price: number | undefined = 0;
-    name!: string;
-}
+import { CreateSolutionsProps } from "./CreateSolutionsProps";
+import { CutModel } from "../models/CutModel";
+import { StockModel } from "../models/StockModel";
 
 export class Solution {
-    stock!: Stock[];
+    stock!: StockModel[];
     wasteTotal!: number;
     wastePieces!: number;
     cost!: number;
@@ -42,13 +11,13 @@ export class Solution {
 }
 
 class Node {
-    segment!: Segment;
-    stock!: Stock;
+    segment!: CutModel;
+    stock!: StockModel;
     parent?: Node;
     children: Node[] = [];
 }
 
-const findStockItemInParents = (node: Node, stockId: number): Stock | undefined => {
+const findStockItemInParents = (node: Node, stockId: number): StockModel | undefined => {
     if (!node?.stock) return undefined;
     if (node.stock.id === stockId) return node.stock;
     if (!node.parent) return undefined;
@@ -67,7 +36,7 @@ export const createSolutionsByTree = ({ segments, stocks, buyableStocks, kerf }:
                 ...s,
                 _remainingLength: s.length,
                 _remainingQuantity: s.quantity,
-            } as Stock)
+            } as StockModel)
     );
     const buyableStocksTemp = buyableStocks.map(
         (bs) =>
@@ -75,7 +44,7 @@ export const createSolutionsByTree = ({ segments, stocks, buyableStocks, kerf }:
                 ...bs,
                 _remainingLength: bs.length,
                 _remainingQuantity: Number.POSITIVE_INFINITY,
-            } as Stock)
+            } as StockModel)
     );
     Array.prototype.push.apply(stocks, buyableStocksTemp);
 
@@ -89,21 +58,21 @@ export const createSolutionsByTree = ({ segments, stocks, buyableStocks, kerf }:
             // get this stock item from further up the chain, otherwise use stock
             const stockItem = findStockItemInParents(node, stock.id);
             // create node if it fits
-            let clonedStockItem: Stock | undefined = undefined;
+            let clonedStockItem: StockModel | undefined = undefined;
             if (stockItem && segment.length === stockItem._remainingLength - stockItem._totalKerf) {
                 // Case 1: the segment fits the stock remaining length (inc. kerf) exactly
                 clonedStockItem = {
                     ...stockItem,
                     _remainingLength: stockItem._remainingLength - segment.length,
                     _totalKerf: stockItem._totalKerf,
-                } as Stock;
+                } as StockModel;
             } else if (stockItem && segment.length < stockItem._remainingLength - stockItem._totalKerf) {
                 // Case 2: the segment fits the stock remaining length (inc. kerf) with remainder
                 clonedStockItem = {
                     ...stockItem,
                     _remainingLength: stockItem._remainingLength - segment.length,
                     _totalKerf: stockItem._totalKerf + kerf,
-                } as Stock;
+                } as StockModel;
             } else if (stockItem && stockItem._remainingQuantity > 1 && segment.length === stock.length) {
                 // Case 3: the segment doesn't fit the stock remaining length, but there is another stock item we can use and the segment fits exactly
                 clonedStockItem = {
@@ -111,7 +80,7 @@ export const createSolutionsByTree = ({ segments, stocks, buyableStocks, kerf }:
                     _remainingLength: stock._remainingLength - segment.length,
                     _remainingQuantity: stockItem._remainingQuantity - 1,
                     _totalKerf: 0,
-                } as Stock;
+                } as StockModel;
             } else if (stockItem && stockItem._remainingQuantity > 1 && segment.length === stock.length) {
                 // Case 4: the segment doesn't fit the stock remaining length, but there is another stock item we can use and the segment fits with remainder
                 clonedStockItem = {
@@ -119,21 +88,21 @@ export const createSolutionsByTree = ({ segments, stocks, buyableStocks, kerf }:
                     _remainingLength: stock._remainingLength - segment.length,
                     _remainingQuantity: stockItem._remainingQuantity - 1,
                     _totalKerf: kerf,
-                } as Stock;
+                } as StockModel;
             } else if (!stockItem && segment.length === stock.length) {
                 // Case 5: this stock hasn't been used yet, and it fits the first one exactly
                 clonedStockItem = {
                     ...stock,
                     _remainingLength: stock._remainingLength - segment.length,
                     _totalKerf: 0,
-                } as Stock;
+                } as StockModel;
             } else if (!stockItem && segment.length <= stock.length) {
                 // Case 6: this stock hasn't been used yet, and it fits the first one with remainder
                 clonedStockItem = {
                     ...stock,
                     _remainingLength: stock._remainingLength - segment.length,
                     _totalKerf: kerf,
-                } as Stock;
+                } as StockModel;
             }
 
             if (clonedStockItem) {

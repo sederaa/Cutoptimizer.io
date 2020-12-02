@@ -7,7 +7,11 @@ import { Tagline } from "main/components/Tagline";
 import { InputSection } from "main/components/InputSection";
 import { CutList } from "main/components/CutList";
 import styled from "styled-components";
-import { createSolutionsByTree, CreateSolutionsProps, Segment, Stock, BuyableStock } from "main/services/createSolutionsTree";
+import { createSolutionsByTree } from "main/services/createSolutionsTree";
+import { BuyableStockModel } from "main/models/BuyableStockModel";
+import { StockModel } from "main/models/StockModel";
+import { CutModel } from "main/models/CutModel";
+import { CreateSolutionsProps } from "main/services/CreateSolutionsProps";
 import { useMachine } from "@xstate/react";
 import { AppMachine, AppMachineEvents, SetKerfEvent, SetCutsEvent } from "main/machines/AppMachine";
 
@@ -21,7 +25,7 @@ const App = () => {
         send({ type: AppMachineEvents.SetKerf, kerf } as SetKerfEvent);
     };
 
-    const handleCutsChanged = (cuts: Segment[]) => {
+    const handleCutsChanged = (cuts: CutModel[]) => {
         console.debug(`App: handleCutsChanged: cuts = `, cuts);
         send({ type: AppMachineEvents.SetCuts, cuts } as SetCutsEvent);
     };

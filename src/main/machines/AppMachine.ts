@@ -1,5 +1,9 @@
 import { Machine, assign } from "xstate";
-import { createSolutionsByTree, CreateSolutionsProps, Segment, Stock, BuyableStock } from "main/services/createSolutionsTree";
+import { createSolutionsByTree } from "main/services/createSolutionsTree";
+import { BuyableStockModel } from "main/models/BuyableStockModel";
+import { StockModel } from "main/models/StockModel";
+import { CutModel } from "main/models/CutModel";
+import { CreateSolutionsProps } from "main/services/CreateSolutionsProps";
 import merge from "lodash.merge";
 
 interface AppMachineContext {
@@ -21,16 +25,16 @@ export enum AppMachineEvents {
     SetCuts = "SetCuts",
 }
 export type SetKerfEvent = { type: AppMachineEvents.SetKerf; kerf: number };
-export type SetCutsEvent = { type: AppMachineEvents.SetCuts; cuts: Segment[] };
+export type SetCutsEvent = { type: AppMachineEvents.SetCuts; cuts: CutModel[] };
 type AppMachineEvent = SetKerfEvent | SetCutsEvent;
 
 export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachineEvent>({
     initial: AppMachineStates.Idle,
     context: {
         input: {
-            segments: [] as Segment[],
-            stocks: [] as Stock[],
-            buyableStocks: [] as BuyableStock[],
+            segments: [] as CutModel[],
+            stocks: [] as StockModel[],
+            buyableStocks: [] as BuyableStockModel[],
             kerf: 0,
         },
     },

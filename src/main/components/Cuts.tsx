@@ -2,17 +2,17 @@ import React from "react";
 import styled from "styled-components";
 import { List } from "common/components/List";
 import { ListItemModel } from "common/models/ListItemModel";
-import { Segment } from "main/services/createSolutionsTree";
+import { CutModel } from "main/models/CutModel";
 
 interface CutsProps {
-    cuts: Segment[];
-    onCutsChanged: (cuts: Segment[]) => void;
+    cuts: CutModel[];
+    onCutsChanged: (cuts: CutModel[]) => void;
 }
 
 export const Cuts = ({ cuts, onCutsChanged }: CutsProps) => {
     const handleItemsChanged = (items: ListItemModel[]) => {
         //console.debug(`Cuts: handleItemsChanged: items = `, items);
-        onCutsChanged(items as Segment[]);
+        onCutsChanged(items as CutModel[]);
     };
     return (
         <StyledCuts>

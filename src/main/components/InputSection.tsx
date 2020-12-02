@@ -4,13 +4,13 @@ import { Cuts } from "main/components/Cuts";
 import { Stock } from "main/components/Stock";
 import { Settings } from "main/components/Settings";
 import { Section } from "main/components/Section";
-import { Segment } from "main/services/createSolutionsTree";
+import { CutModel } from "main/models/CutModel";
 
 interface InputSectionProps {
-    cuts: Segment[];
+    cuts: CutModel[];
     kerf: number;
     onKerfChanged: (kerf: number) => void;
-    onCutsChanged: (cuts: Segment[]) => void;
+    onCutsChanged: (cuts: CutModel[]) => void;
 }
 
 export const InputSection = ({ kerf, cuts, onKerfChanged, onCutsChanged }: InputSectionProps) => {
