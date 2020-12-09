@@ -7,9 +7,10 @@ interface IntegerFieldProps {
     max?: number;
     placeholder?: string;
     onChange: (value: number | null) => void;
+    onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
-export const IntegerField = ({ name, value, min, max, placeholder, onChange }: IntegerFieldProps) => {
+export const IntegerField = ({ name, value, min, max, placeholder, onChange, onBlur }: IntegerFieldProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.value === "") onChange(null);
         const isNumber = /^\d+$/.test(e.target.value);
@@ -20,5 +21,14 @@ export const IntegerField = ({ name, value, min, max, placeholder, onChange }: I
         if (max !== undefined && numericValue > max) return;
         onChange(numericValue);
     };
-    return <input type="text" name={name} value={value} onChange={handleChange} placeholder={placeholder} />;
+    return (
+        <input
+            type="text"
+            name={name}
+            value={value}
+            onChange={handleChange}
+            onBlur={onBlur}
+            placeholder={placeholder}
+        />
+    );
 };

@@ -4,6 +4,7 @@ import { useMachine } from "@xstate/react";
 import { ListMachine, ListEvents, UpdateFieldEvent, AddEvent, DeleteEvent } from "common/components/ListMachine";
 import { ListItemModel } from "common/models/ListItemModel";
 import { IntegerField } from "common/components/IntegerField";
+import constants from "constants.json";
 
 interface ListProps {
     items: ListItemModel[];
@@ -36,7 +37,12 @@ export const List = ({ items, onItemsChanged }: ListProps) => {
         <>
             <ul>
                 {items.map((i) => (
-                    <ListItem key={i.id} data={i} handleDeleteItem={handleDeleteItem} handleUpdateField={handleUpdateField} />
+                    <ListItem
+                        key={i.id}
+                        data={i}
+                        handleDeleteItem={handleDeleteItem}
+                        handleUpdateField={handleUpdateField}
+                    />
                 ))}
             </ul>
             <button onClick={handleAddClick}>+ Add</button>
@@ -54,9 +60,30 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField }: ListItem
     return (
         <li>
             {data.id}.
-            <input type="text" name="name" value={data.name} onChange={(e) => handleUpdateField(data.id, "name", e.target.value)} placeholder="Name" />
-            <IntegerField name="length" placeholder="Length" value={data.length ?? ""} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "length", value?.toString() ?? "")} />
-            <IntegerField name="quantity" placeholder="Quantity" value={data.quantity ?? ""} min={1} max={99999} onChange={(value) => handleUpdateField(data.id, "quantity", value?.toString() ?? "")} />
+            <input
+                type="text"
+                name="name"
+                value={data.name}
+                onChange={(e) => handleUpdateField(data.id, "name", e.target.value)}
+                placeholder="Name"
+                maxLength={constants.Entities.ListItem.Name.Maxlength}
+            />
+            <IntegerField
+                name="length"
+                placeholder="Length"
+                value={data.length ?? ""}
+                min={constants.Entities.ListItem.Length.Min}
+                max={constants.Entities.ListItem.Length.Max}
+                onChange={(value) => handleUpdateField(data.id, "length", value?.toString() ?? "")}
+            />
+            <IntegerField
+                name="quantity"
+                placeholder="Quantity"
+                value={data.quantity ?? ""}
+                min={constants.Entities.ListItem.Quantity.Min}
+                max={constants.Entities.ListItem.Quantity.Max}
+                onChange={(value) => handleUpdateField(data.id, "quantity", value?.toString() ?? "")}
+            />
             <button onClick={() => handleDeleteItem(data.id)}>x</button>
         </li>
     );
