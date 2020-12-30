@@ -1,5 +1,5 @@
 import { Machine, assign } from "xstate";
-import { ListItemModel, makeEmptyListItemData } from "common/models/ListItemModel";
+import { ListItemModel, makeEmptyListItemData, nameofListItemModel } from "common/models/ListItemModel";
 
 export enum ListStates {
     Idle = "Idle",
@@ -73,7 +73,11 @@ export const ListMachine = Machine<ListContext, ListSchema, ListEvent>({
                     ...ev.items.filter((i) => i.id !== ev.id),
                     {
                         ...ev.items.find((i) => i.id === ev.id),
-                        [ev.name]: ev.value,
+                        [ev.name]: [nameofListItemModel("length"), nameofListItemModel("quantity")].some(
+                            (x) => x === ev.name
+                        )
+                            ? parseInt(ev.value)
+                            : ev.value,
                     } as ListItemModel,
                 ].sort((i) => i.id);
                 context.onItemsChanged(items);
@@ -92,7 +96,10 @@ export const ListMachine = Machine<ListContext, ListSchema, ListEvent>({
         [ListStates.Adding]: {
             entry: (context: ListContext, event: ListEvent) => {
                 const ev = event as AddEvent;
-                const highestExistingId = ev.items.reduce((highestId, currentValue) => (currentValue.id > highestId ? currentValue.id : highestId), 0);
+                const highestExistingId = ev.items.reduce(
+                    (highestId, currentValue) => (currentValue.id > highestId ? currentValue.id : highestId),
+                    0
+                );
                 const result = [...ev.items, makeEmptyListItemData(highestExistingId + 1)];
                 context.onItemsChanged(result);
             },

@@ -63,70 +63,80 @@ export const createSolutionsByTree = (
 
     const root = new Node();
 
-    const buildTree = (node: Node, segmentIndex: number) => {
-        if (segmentIndex < 0) return;
-        const segment = cuts[segmentIndex];
+    const buildTree = (node: Node, cutIndex: number) => {
+        //console.debug(`buildTree: cutIndex = ${cutIndex}.`);
+        if (cutIndex < 0) return;
+        const cut = cuts[cutIndex];
         node.children = node.children ?? [];
         for (const stock of stocks) {
             // get this stock item from further up the chain, otherwise use stock
             const stockItem = findStockItemInParents(node, stock.id);
+            //console.debug(                `buildTree [cutIndex=${cutIndex},stock=${stock.id}]: cut.length = ${cut.length}, stockItem._remainingLength = ${stockItem?._remainingLength}, stockItem._totalKerf = ${stockItem?._totalKerf}, stockItem._remainingQuantity = ${stockItem?._remainingQuantity}, stock.length = ${stock.length}, stockItem = `,                stockItem,                `, cut = `,                cut            );
             // create node if it fits
             let clonedStockItem: StockModel | undefined = undefined;
-            if (stockItem && segment.length === stockItem._remainingLength - stockItem._totalKerf) {
+            if (stockItem && cut.length === stockItem._remainingLength - stockItem._totalKerf) {
+                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 1.`);
                 // Case 1: the segment fits the stock remaining length (inc. kerf) exactly
                 clonedStockItem = {
                     ...stockItem,
-                    _remainingLength: stockItem._remainingLength - segment.length,
+                    _remainingLength: stockItem._remainingLength - cut.length,
                     _totalKerf: stockItem._totalKerf,
                 } as StockModel;
-            } else if (stockItem && segment.length < stockItem._remainingLength - stockItem._totalKerf) {
+            } else if (stockItem && cut.length < stockItem._remainingLength - stockItem._totalKerf) {
+                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 2.`);
                 // Case 2: the segment fits the stock remaining length (inc. kerf) with remainder
                 clonedStockItem = {
                     ...stockItem,
-                    _remainingLength: stockItem._remainingLength - segment.length,
+                    _remainingLength: stockItem._remainingLength - cut.length,
                     _totalKerf: stockItem._totalKerf + kerf,
                 } as StockModel;
-            } else if (stockItem && stockItem._remainingQuantity > 1 && segment.length === stock.length) {
+            } else if (stockItem && stockItem._remainingQuantity > 1 && cut.length === stock.length) {
+                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 3.`);
                 // Case 3: the segment doesn't fit the stock remaining length, but there is another stock item we can use and the segment fits exactly
                 clonedStockItem = {
                     ...stock,
-                    _remainingLength: stock._remainingLength - segment.length,
+                    _remainingLength: stock._remainingLength - cut.length,
                     _remainingQuantity: stockItem._remainingQuantity - 1,
                     _totalKerf: 0,
                 } as StockModel;
-            } else if (stockItem && stockItem._remainingQuantity > 1 && segment.length === stock.length) {
+            } else if (stockItem && stockItem._remainingQuantity > 1 && cut.length === stock.length) {
+                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 4.`);
                 // Case 4: the segment doesn't fit the stock remaining length, but there is another stock item we can use and the segment fits with remainder
                 clonedStockItem = {
                     ...stock,
-                    _remainingLength: stock._remainingLength - segment.length,
+                    _remainingLength: stock._remainingLength - cut.length,
                     _remainingQuantity: stockItem._remainingQuantity - 1,
                     _totalKerf: kerf,
                 } as StockModel;
-            } else if (!stockItem && segment.length === stock.length) {
+            } else if (!stockItem && cut.length === stock.length) {
+                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 5.`);
                 // Case 5: this stock hasn't been used yet, and it fits the first one exactly
                 clonedStockItem = {
                     ...stock,
-                    _remainingLength: stock._remainingLength - segment.length,
+                    _remainingLength: stock._remainingLength - cut.length,
                     _totalKerf: 0,
                 } as StockModel;
-            } else if (!stockItem && segment.length <= stock.length) {
+            } else if (!stockItem && cut.length <= stock.length) {
+                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 6.`);
                 // Case 6: this stock hasn't been used yet, and it fits the first one with remainder
                 clonedStockItem = {
                     ...stock,
-                    _remainingLength: stock._remainingLength - segment.length,
+                    _remainingLength: stock._remainingLength - cut.length,
                     _totalKerf: kerf,
                 } as StockModel;
+            } else {
+                console.error(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: no fit.`);
             }
 
             if (clonedStockItem) {
                 const newNode = {
                     stock: clonedStockItem,
-                    cut: segment,
+                    cut: cut,
                     parent: node,
                     children: [],
                 } as Node;
                 node.children.push(newNode);
-                buildTree(newNode, segmentIndex - 1);
+                buildTree(newNode, cutIndex - 1);
             }
         }
     };

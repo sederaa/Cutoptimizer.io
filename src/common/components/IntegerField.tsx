@@ -16,9 +16,7 @@ export const IntegerField = ({ name, value, min, max, placeholder, onChange, onB
         const isNumber = /^\d+$/.test(e.target.value);
         if (!isNumber) return;
         const numericValue = parseInt(e.target.value);
-        console.debug(
-            `handleNumericFieldChange: e.target.value = ${e.target.value}, numericValue = ${numericValue}, isNumber = ${isNumber}.`
-        );
+        //console.debug(`handleNumericFieldChange: e.target.value = ${e.target.value}, numericValue = ${numericValue}, isNumber = ${isNumber}.`);
         if (min !== undefined && numericValue < min) return;
         if (max !== undefined && numericValue > max) return;
         onChange(numericValue);
