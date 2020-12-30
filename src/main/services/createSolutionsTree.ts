@@ -7,10 +7,9 @@ export class Solution {
     wasteTotal!: number;
     wastePieces!: number;
     cost!: number;
-    _path!: string;
 }
 
-class Node {
+export class Node {
     cut!: CutModel;
     stock!: StockModel;
     parent?: Node;
@@ -24,21 +23,13 @@ const findStockItemInParents = (node: Node, stockId: number): StockModel | undef
     return findStockItemInParents(node.parent, stockId);
 };
 
-export const createSolutionsByTree = (
+export const createSolutionsTree = (
     cuts: CutModel[],
     stocks: StockModel[],
     buyableStocks: BuyableStockModel[],
     kerf: number
-) /*: Solution[]*/ => {
-    console.debug(
-        `createSolutionsByTree: cuts = `,
-        cuts,
-        `, stock = `,
-        stocks,
-        `, buyableStocks = `,
-        buyableStocks,
-        `, kerf = ${kerf}.`
-    );
+): Node => {
+    //console.debug(        `createSolutionsTree: cuts = `,        cuts,        `, stock = `,        stocks,        `, buyableStocks = `,        buyableStocks,        `, kerf = ${kerf}.`    );
 
     // sort segments by length ascending
     cuts.sort((s1, s2) => (s1.length === s2.length ? 0 : s1.length < s2.length ? 1 : -1));
@@ -142,18 +133,5 @@ export const createSolutionsByTree = (
     };
 
     buildTree(root, cuts.length - 1);
-
-    const printTree = (node: Node, level: number) => {
-        const indent = " ".repeat(level * 3);
-        console.log(
-            `${indent}* CUT ${node?.cut?.id} STOCK ${node?.stock?.id} (len: ${node?.stock?._remainingLength}/${node?.stock?.length}, qty: ${node?.stock?._remainingQuantity}/${node?.stock?.quantity}, kerf: ${node?.stock?._totalKerf})`
-        );
-        for (const childNode of node.children) {
-            printTree(childNode, level + 1);
-        }
-    };
-
-    //console.log(root);
-
-    printTree(root, 0);
+    return root;
 };

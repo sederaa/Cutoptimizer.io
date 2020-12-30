@@ -1,5 +1,6 @@
 import { Machine, assign } from "xstate";
-import { createSolutionsByTree } from "main/services/createSolutionsTree";
+import { createSolutionsTree, Node } from "main/services/createSolutionsTree";
+import { printTree } from "main/services/printTree";
 import { BuyableStockModel } from "main/models/BuyableStockModel";
 import { StockModel } from "main/models/StockModel";
 import { CutModel } from "main/models/CutModel";
@@ -91,13 +92,15 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
             ],
         },
         [AppMachineStates.Calculating]: {
-            entry: (context) =>
-                createSolutionsByTree(
+            entry: (context) => {
+                const treeRootNode = createSolutionsTree(
                     context.input.cuts,
                     context.input.stocks,
                     context.input.buyableStocks,
                     context.input.kerf
-                ),
+                );
+                printTree(treeRootNode, 0);
+            },
             always: AppMachineStates.Idle,
         },
     },
