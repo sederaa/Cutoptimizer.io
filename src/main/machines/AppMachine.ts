@@ -3,21 +3,31 @@ import { createSolutionsByTree } from "main/services/createSolutionsTree";
 import { BuyableStockModel } from "main/models/BuyableStockModel";
 import { StockModel } from "main/models/StockModel";
 import { CutModel } from "main/models/CutModel";
-import { CreateSolutionsProps } from "main/services/CreateSolutionsProps";
 import merge from "lodash.merge";
-import { makeEmptyListItemData } from "common/models/ListItemModel";
+import { makeEmptyListItemData, isEmptyListItemData } from "common/models/ListItemModel";
 
 interface AppMachineContext {
-    input: CreateSolutionsProps;
+    input: Input;
+}
+
+interface Input {
+    cuts: CutModel[];
+    stocks: StockModel[];
+    buyableStocks: BuyableStockModel[];
+    kerf: number;
 }
 
 export enum AppMachineStates {
     Idle = "Idle",
+    CheckingReadyForCalculation = "CheckingReadyForCalculation",
+    Calculating = "Calculating",
 }
 
 interface AppMachineSchema {
     states: {
         [AppMachineStates.Idle]: {};
+        [AppMachineStates.CheckingReadyForCalculation]: {};
+        [AppMachineStates.Calculating]: {};
     };
 }
 
@@ -48,18 +58,47 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
                     actions: assign({
                         input: (context, event: SetKerfEvent) => merge(context.input, { kerf: event.kerf }),
                     }),
+                    target: AppMachineStates.CheckingReadyForCalculation,
                 },
                 [AppMachineEvents.SetCuts]: {
                     actions: assign({
                         input: (context, event: SetCutsEvent) => merge(context.input, { cuts: event.cuts }),
                     }),
+                    target: AppMachineStates.CheckingReadyForCalculation,
                 },
                 [AppMachineEvents.SetStock]: {
                     actions: assign({
                         input: (context, event: SetStockEvent) => merge(context.input, { stocks: event.stock }),
                     }),
+                    target: AppMachineStates.CheckingReadyForCalculation,
                 },
             },
+        },
+        [AppMachineStates.CheckingReadyForCalculation]: {
+            always: [
+                {
+                    cond: (context) =>
+                        context.input.cuts.some((c) => !isEmptyListItemData(c)) &&
+                        context.input.stocks.some(
+                            (c) => !isEmptyListItemData(c)
+                        ) /*||
+                            context.input.buyableStocks.some((c) => c.id > 0)*/,
+                    target: AppMachineStates.Calculating,
+                },
+                {
+                    target: AppMachineStates.Idle,
+                },
+            ],
+        },
+        [AppMachineStates.Calculating]: {
+            entry: (context) =>
+                createSolutionsByTree(
+                    context.input.cuts,
+                    context.input.stocks,
+                    context.input.buyableStocks,
+                    context.input.kerf
+                ),
+            always: AppMachineStates.Idle,
         },
     },
 });

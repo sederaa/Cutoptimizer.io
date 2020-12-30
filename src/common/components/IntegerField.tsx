@@ -14,9 +14,11 @@ export const IntegerField = ({ name, value, min, max, placeholder, onChange, onB
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.value === "") onChange(null);
         const isNumber = /^\d+$/.test(e.target.value);
-        //console.debug(`handleNumericFieldChange: e.target.value = ${e.target.value}, numericValue = ${numericValue}, isNumber = ${isNumber}.`);
         if (!isNumber) return;
         const numericValue = parseInt(e.target.value);
+        console.debug(
+            `handleNumericFieldChange: e.target.value = ${e.target.value}, numericValue = ${numericValue}, isNumber = ${isNumber}.`
+        );
         if (min !== undefined && numericValue < min) return;
         if (max !== undefined && numericValue > max) return;
         onChange(numericValue);

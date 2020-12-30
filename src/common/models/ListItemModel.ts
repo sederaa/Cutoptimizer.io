@@ -6,3 +6,5 @@ export interface ListItemModel {
 }
 
 export const makeEmptyListItemData = (id: number) => ({ id, name: "", length: null, quantity: 1 } as ListItemModel);
+
+export const isEmptyListItemData = (item: ListItemModel) => item.name === "" && item.length === null;

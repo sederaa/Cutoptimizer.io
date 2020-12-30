@@ -1,6 +1,6 @@
-import { CreateSolutionsProps } from "./CreateSolutionsProps";
 import { CutModel } from "../models/CutModel";
 import { StockModel } from "../models/StockModel";
+import { BuyableStockModel } from "../models/BuyableStockModel";
 
 export class Solution {
     stock!: StockModel[];
@@ -11,7 +11,7 @@ export class Solution {
 }
 
 class Node {
-    segment!: CutModel;
+    cut!: CutModel;
     stock!: StockModel;
     parent?: Node;
     children: Node[] = [];
@@ -24,8 +24,21 @@ const findStockItemInParents = (node: Node, stockId: number): StockModel | undef
     return findStockItemInParents(node.parent, stockId);
 };
 
-export const createSolutionsByTree = ({ cuts, stocks, buyableStocks, kerf }: CreateSolutionsProps) /*: Solution[]*/ => {
-    //console.debug(`createSolutions: cuts = `, cuts, `, stock = `, stock, `, buyableStocks = `, buyableStocks, `, kerf = ${kerf}.`);
+export const createSolutionsByTree = (
+    cuts: CutModel[],
+    stocks: StockModel[],
+    buyableStocks: BuyableStockModel[],
+    kerf: number
+) /*: Solution[]*/ => {
+    console.debug(
+        `createSolutionsByTree: cuts = `,
+        cuts,
+        `, stock = `,
+        stocks,
+        `, buyableStocks = `,
+        buyableStocks,
+        `, kerf = ${kerf}.`
+    );
 
     // sort segments by length ascending
     cuts.sort((s1, s2) => (s1.length === s2.length ? 0 : s1.length < s2.length ? 1 : -1));
@@ -108,7 +121,7 @@ export const createSolutionsByTree = ({ cuts, stocks, buyableStocks, kerf }: Cre
             if (clonedStockItem) {
                 const newNode = {
                     stock: clonedStockItem,
-                    segment: segment,
+                    cut: segment,
                     parent: node,
                     children: [],
                 } as Node;
@@ -122,13 +135,15 @@ export const createSolutionsByTree = ({ cuts, stocks, buyableStocks, kerf }: Cre
 
     const printTree = (node: Node, level: number) => {
         const indent = " ".repeat(level * 3);
-        console.log(`${indent}* SEGMENT ${node?.segment?.id} STOCK ${node?.stock?.id} (len: ${node?.stock?._remainingLength}/${node?.stock?.length}, qty: ${node?.stock?._remainingQuantity}/${node?.stock?.quantity}, kerf: ${node?.stock?._totalKerf})`);
+        console.log(
+            `${indent}* CUT ${node?.cut?.id} STOCK ${node?.stock?.id} (len: ${node?.stock?._remainingLength}/${node?.stock?.length}, qty: ${node?.stock?._remainingQuantity}/${node?.stock?.quantity}, kerf: ${node?.stock?._totalKerf})`
+        );
         for (const childNode of node.children) {
             printTree(childNode, level + 1);
         }
     };
 
-    console.log(root);
+    //console.log(root);
 
     printTree(root, 0);
 };

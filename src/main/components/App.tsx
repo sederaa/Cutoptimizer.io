@@ -17,7 +17,7 @@ const StyledApp = styled.div``;
 
 const App = () => {
     const [state, send] = useMachine(AppMachine);
-    console.debug(`App: state.context.input = `, state.context.input);
+    //console.debug(`App: state.context.input = `, state.context.input);
 
     const handleKerfChanged = (kerf: number) => {
         send({ type: AppMachineEvents.SetKerf, kerf } as SetKerfEvent);
@@ -37,7 +37,14 @@ const App = () => {
         <StyledApp>
             <Header />
             <Tagline />
-            <InputSection kerf={state.context.input.kerf} onKerfChanged={handleKerfChanged} cuts={state.context.input.cuts} onCutsChanged={handleCutsChanged} stock={state.context.input.stocks} onStockChanged={handleStockChanged} />
+            <InputSection
+                kerf={state.context.input.kerf}
+                onKerfChanged={handleKerfChanged}
+                cuts={state.context.input.cuts}
+                onCutsChanged={handleCutsChanged}
+                stock={state.context.input.stocks}
+                onStockChanged={handleStockChanged}
+            />
             <CutList />
         </StyledApp>
     );
