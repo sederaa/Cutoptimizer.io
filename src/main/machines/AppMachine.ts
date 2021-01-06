@@ -39,15 +39,26 @@ export enum AppMachineEvents {
 }
 export type SetKerfEvent = { type: AppMachineEvents.SetKerf; kerf: number };
 export type SetCutsEvent = { type: AppMachineEvents.SetCuts; cuts: CutModel[] };
-export type SetStockEvent = { type: AppMachineEvents.SetStock; stock: CutModel[] };
+export type SetStockEvent = { type: AppMachineEvents.SetStock; stock: StockModel[] };
 type AppMachineEvent = SetKerfEvent | SetCutsEvent | SetStockEvent;
 
 export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachineEvent>({
     initial: AppMachineStates.Idle,
     context: {
         input: {
+            /*
             cuts: [makeEmptyListItemData(0)] as CutModel[],
             stocks: [makeEmptyListItemData(0)] as StockModel[],
+            */
+
+            cuts: [
+                { id: 1, name: "c1", length: 10, quantity: 1 } as CutModel,
+                { id: 2, name: "c2", length: 10, quantity: 1 } as CutModel,
+            ],
+            stocks: [
+                { id: 10, name: "s1", length: 20, quantity: 1 } as StockModel,
+                { id: 11, name: "s2", length: 10, quantity: 1 } as StockModel,
+            ],
             buyableStocks: [] as BuyableStockModel[],
             kerf: 0,
         },
@@ -57,19 +68,19 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
             on: {
                 [AppMachineEvents.SetKerf]: {
                     actions: assign({
-                        input: (context, event: SetKerfEvent) => merge(context.input, { kerf: event.kerf }),
+                        input: (context, event: SetKerfEvent) => ({ ...context.input, kerf: event.kerf }),
                     }),
                     target: AppMachineStates.CheckingReadyForCalculation,
                 },
                 [AppMachineEvents.SetCuts]: {
                     actions: assign({
-                        input: (context, event: SetCutsEvent) => merge(context.input, { cuts: event.cuts }),
+                        input: (context, event: SetCutsEvent) => ({ ...context.input, cuts: event.cuts }),
                     }),
                     target: AppMachineStates.CheckingReadyForCalculation,
                 },
                 [AppMachineEvents.SetStock]: {
                     actions: assign({
-                        input: (context, event: SetStockEvent) => merge(context.input, { stocks: event.stock }),
+                        input: (context, event: SetStockEvent) => ({ ...context.input, stocks: event.stock }),
                     }),
                     target: AppMachineStates.CheckingReadyForCalculation,
                 },

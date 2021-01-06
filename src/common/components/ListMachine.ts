@@ -79,7 +79,8 @@ export const ListMachine = Machine<ListContext, ListSchema, ListEvent>({
                             ? parseInt(ev.value)
                             : ev.value,
                     } as ListItemModel,
-                ].sort((i) => i.id);
+                ].sort((a, b) => a.id - b.id);
+                //console.debug(`ListStates.UpdatingField: items = `, JSON.parse(JSON.stringify(items)));
                 context.onItemsChanged(items);
             },
             always: ListStates.Idle,
