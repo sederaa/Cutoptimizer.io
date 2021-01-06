@@ -1,14 +1,51 @@
 import { Node } from "main/services/createSolutionsTree";
+import { StockModel } from "main/models/StockModel";
 
-export const findSolutionByLeastStockUsed = (node: Node) => {
-    for (const childNode of node.children) {
-        const childNodeResult = findSolutionByLeastStockUsed(childNode);
-        //printTree(childNode, level + 1);
+const assignStockPiecesUsed = (node: Node, stockIds: Set<number>) => {
+    let nodeStockIds = new Set(stockIds);
+    if (node.stock) {
+        nodeStockIds.add(node.stock.id);
     }
-    const result = {} as InterimResult;
+    node._stockUsed = nodeStockIds.size;
+    for (const childNode of node.children) {
+        assignStockPiecesUsed(childNode, nodeStockIds);
+    }
 };
 
-type InterimResult = {
-    count: number;
-    nodes: Node[];
+const findLeafNodeWithLowestStockUsed = (node: Node): Node | undefined => {
+    let leafNodeWithLowestStockUsed: Node | undefined = undefined;
+    const findLeafNodeWithLowestStockUsedInternal = (node2: Node) => {
+        if (node2.children?.length === 0) {
+            if (
+                node2._stockUsed !== undefined &&
+                (leafNodeWithLowestStockUsed?._stockUsed === undefined ||
+                    node2._stockUsed < leafNodeWithLowestStockUsed._stockUsed)
+            ) {
+                leafNodeWithLowestStockUsed = node2;
+            }
+        } else {
+            for (const childNode of node2.children) {
+                findLeafNodeWithLowestStockUsedInternal(childNode);
+            }
+        }
+    };
+    findLeafNodeWithLowestStockUsedInternal(node);
+    return leafNodeWithLowestStockUsed;
+};
+
+const getNodeLineage = (node: Node): Node[] => {
+    if (node.parent === undefined) return [node];
+    return [node, ...getNodeLineage(node.parent)];
+};
+
+export const findSolutionByLeastStockUsed = (node: Node) => {
+    assignStockPiecesUsed(node, new Set());
+
+    let leafNodeWithLowestStockUsed = findLeafNodeWithLowestStockUsed(node);
+    if (leafNodeWithLowestStockUsed === undefined) return undefined;
+
+    const nodes = getNodeLineage(leafNodeWithLowestStockUsed);
+
+    console.debug(JSON.parse(JSON.stringify(nodes)));
+    //TODO: merge nodes for the same stock and return stocks with their cuts inside
 };

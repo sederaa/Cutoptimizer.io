@@ -6,6 +6,7 @@ import { StockModel } from "main/models/StockModel";
 import { CutModel } from "main/models/CutModel";
 import merge from "lodash.merge";
 import { makeEmptyListItemData, isEmptyListItemData } from "common/models/ListItemModel";
+import { findSolutionByLeastStockUsed } from "main/services/findSolutionByLeastStockUsed";
 
 interface AppMachineContext {
     input: Input;
@@ -111,6 +112,7 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
                     context.input.kerf
                 );
                 printTree(treeRootNode, 0);
+                findSolutionByLeastStockUsed(treeRootNode);
             },
             always: AppMachineStates.Idle,
         },

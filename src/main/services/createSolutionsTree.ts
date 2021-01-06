@@ -14,6 +14,7 @@ export class Node {
     stock!: StockModel;
     parent?: Node;
     children: Node[] = [];
+    _stockUsed?: number;
 }
 
 const findStockItemInParents = (node: Node, stockId: number): StockModel | undefined => {
