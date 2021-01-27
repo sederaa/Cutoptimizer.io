@@ -16,6 +16,7 @@ export class Node {
     parent?: Node;
     children: Node[] = [];
     _stockUsed?: number;
+    _complete: boolean = false;
 }
 
 const findStockItemInParents = (node: Node, stockId: number): StockModel | undefined => {
@@ -58,15 +59,17 @@ export const createSolutionsTree = (
 
     const root = new Node();
 
-    const buildTree = (node: Node, cutIndex: number) => {
+    const buildTree = (node: Node, cutIndex: number): boolean => {
         //console.debug(`buildTree: cutIndex = ${cutIndex}.`);
-        if (cutIndex < 0) return;
+        if (cutIndex < 0) return true;
         const cut = expandedCuts[cutIndex];
         node.children = node.children ?? [];
+        let completed: boolean = false;
+
         for (const stock of stocks) {
             // get this stock item from further up the chain, otherwise use stock
             const stockItem = findStockItemInParents(node, stock.id);
-            //console.debug(                `buildTree [cutIndex=${cutIndex},stock=${stock.id}]: cut.length = ${cut.length}, stockItem._remainingLength = ${stockItem?._remainingLength}, stockItem._totalKerf = ${stockItem?._totalKerf}, stockItem._remainingQuantity = ${stockItem?._remainingQuantity}, stock.length = ${stock.length}, stockItem = `,                stockItem,                `, cut = `,                cut            );
+            //console.debug(                `buildTree [cutIndex=${cutIndex},stock=${stock.id}]: cut.length = ${cut.length}, stockItem._remainingLength = ${stockItem?._remainingLength}, stockItem._totalKerf = ${stockItem?._totalKerf}, stockItem._remainingQuantity = ${stockItem?._remainingQuantity}, stock.length = ${stock.length}, stockItem = `,                stockItem,                `, cut = `,                 cut            );
             // create node if it fits
             let clonedStockItem: StockModel | undefined = undefined;
             if (stockItem && cut.length === stockItem._remainingLength - stockItem._totalKerf) {
@@ -129,11 +132,15 @@ export const createSolutionsTree = (
                     cut: cut,
                     parent: node,
                     children: [],
+                    _complete: cutIndex === 0,
                 } as Node;
                 node.children.push(newNode);
-                buildTree(newNode, cutIndex - 1);
+                let result = buildTree(newNode, cutIndex - 1);
+                node._complete = result;
+                completed = result ? true : completed;
             }
         }
+        return completed;
     };
 
     const weedOutIncompleteSolutions = () => {

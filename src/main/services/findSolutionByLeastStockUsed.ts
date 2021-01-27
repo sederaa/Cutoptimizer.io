@@ -44,11 +44,11 @@ export const findSolutionByLeastStockUsed = (node: Node) => {
     let leafNodeWithLowestStockUsed = findLeafNodeWithLowestStockUsed(node);
     if (leafNodeWithLowestStockUsed === undefined) return undefined;
 
-    console.debug(`leafNodeWithLowestStockUsed = `, leafNodeWithLowestStockUsed);
+    //console.debug(`leafNodeWithLowestStockUsed = `, leafNodeWithLowestStockUsed);
 
     const nodes = getNodeLineage(leafNodeWithLowestStockUsed);
 
-    console.debug(`leafNodeWithLowestStockUsed lineage = `, nodes);
+    //console.debug(`leafNodeWithLowestStockUsed lineage = `, nodes);
 
     //TODO: merge nodes for the same stock and return stocks with their cuts inside
 };
