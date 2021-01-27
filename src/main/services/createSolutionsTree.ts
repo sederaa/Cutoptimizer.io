@@ -1,6 +1,7 @@
 import { CutModel } from "../models/CutModel";
 import { StockModel } from "../models/StockModel";
 import { BuyableStockModel } from "../models/BuyableStockModel";
+import range from "lodash.range";
 
 export class Solution {
     stock!: StockModel[];
@@ -32,8 +33,10 @@ export const createSolutionsTree = (
 ): Node => {
     //console.debug(        `createSolutionsTree: cuts = `,        cuts,        `, stock = `,        stocks,        `, buyableStocks = `,        buyableStocks,        `, kerf = ${kerf}.`    );
 
-    // sort segments by length ascending
-    cuts.sort((s1, s2) => (s1.length === s2.length ? 0 : s1.length < s2.length ? 1 : -1));
+    let expandedCuts = cuts.flatMap((c) => range(1, (c.quantity ?? 1) + 1).map((i) => ({ ...c, id: c.id + i / 100 })));
+    //console.debug(`createSolutionsTree: expandedCuts = `, expandedCuts);
+    // sort cuts by length ascending
+    expandedCuts.sort((s1, s2) => (s1.length === s2.length ? 0 : s1.length < s2.length ? 1 : -1));
 
     stocks = stocks.map(
         (s) =>
@@ -58,7 +61,7 @@ export const createSolutionsTree = (
     const buildTree = (node: Node, cutIndex: number) => {
         //console.debug(`buildTree: cutIndex = ${cutIndex}.`);
         if (cutIndex < 0) return;
-        const cut = cuts[cutIndex];
+        const cut = expandedCuts[cutIndex];
         node.children = node.children ?? [];
         for (const stock of stocks) {
             // get this stock item from further up the chain, otherwise use stock
@@ -133,6 +136,11 @@ export const createSolutionsTree = (
         }
     };
 
-    buildTree(root, cuts.length - 1);
+    const weedOutIncompleteSolutions = () => {
+        //TODO
+    };
+
+    buildTree(root, expandedCuts.length - 1);
+    weedOutIncompleteSolutions();
     return root;
 };

@@ -53,8 +53,9 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
             */
 
             cuts: [
-                { id: 1, name: "c1", length: 10, quantity: 1 } as CutModel,
+                { id: 1, name: "c1", length: 5, quantity: 1 } as CutModel,
                 { id: 2, name: "c2", length: 10, quantity: 1 } as CutModel,
+                { id: 3, name: "c3", length: 15, quantity: 1 } as CutModel,
             ],
             stocks: [
                 { id: 10, name: "s1", length: 20, quantity: 1 } as StockModel,
