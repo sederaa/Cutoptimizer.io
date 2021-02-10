@@ -2,6 +2,7 @@ import { CutModel } from "../models/CutModel";
 import { StockModel } from "../models/StockModel";
 import { BuyableStockModel } from "../models/BuyableStockModel";
 import range from "lodash.range";
+import { createNoSubstitutionTemplateLiteral } from "typescript";
 
 export class Solution {
     stock!: StockModel[];
@@ -11,6 +12,7 @@ export class Solution {
 }
 
 export class Node {
+    id!: number;
     cut!: CutModel;
     stock!: StockModel;
     parent?: Node;
@@ -35,9 +37,9 @@ export const createSolutionsTree = (
     //console.debug(        `createSolutionsTree: cuts = `,        cuts,        `, stock = `,        stocks,        `, buyableStocks = `,        buyableStocks,        `, kerf = ${kerf}.`    );
 
     let expandedCuts = cuts.flatMap((c) => range(1, (c.quantity ?? 1) + 1).map((i) => ({ ...c, id: c.id + i / 100 })));
-    //console.debug(`createSolutionsTree: expandedCuts = `, expandedCuts);
     // sort cuts by length ascending
     expandedCuts.sort((s1, s2) => (s1.length === s2.length ? 0 : s1.length < s2.length ? 1 : -1));
+    //console.debug(`createSolutionsTree: expandedCuts sorted = `, expandedCuts);
 
     stocks = stocks.map(
         (s) =>
@@ -57,23 +59,34 @@ export const createSolutionsTree = (
     );
     Array.prototype.push.apply(stocks, buyableStocksTemp);
 
+    function* idMaker() {
+        var index = 0;
+        while (true) yield index++;
+    }
+    var nodeIdMaker = idMaker();
+
     const root = new Node();
+    root.id = nodeIdMaker.next().value as number;
 
     const buildTree = (node: Node, cutIndex: number): boolean => {
-        //console.debug(`buildTree: cutIndex = ${cutIndex}.`);
-        if (cutIndex < 0) return true;
+        //console.group(`buildTree: cutIndex = ${cutIndex}.`);
+        if (cutIndex < 0) {
+            //console.groupEnd();
+            return true;
+        }
         const cut = expandedCuts[cutIndex];
+        //console.debug(`cut=`, cut);
         node.children = node.children ?? [];
         let completed: boolean = false;
 
         for (const stock of stocks) {
             // get this stock item from further up the chain, otherwise use stock
             const stockItem = findStockItemInParents(node, stock.id);
-            //console.debug(                `buildTree [cutIndex=${cutIndex},stock=${stock.id}]: cut.length = ${cut.length}, stockItem._remainingLength = ${stockItem?._remainingLength}, stockItem._totalKerf = ${stockItem?._totalKerf}, stockItem._remainingQuantity = ${stockItem?._remainingQuantity}, stock.length = ${stock.length}, stockItem = `,                stockItem,                `, cut = `,                 cut            );
+            //console.group(`stock=`, stock, `, stockItem=`, stockItem);
             // create node if it fits
             let clonedStockItem: StockModel | undefined = undefined;
             if (stockItem && cut.length === stockItem._remainingLength - stockItem._totalKerf) {
-                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 1.`);
+                //console.debug(                    `Case 1: cut ${cut.name}#${cut.id} fits stockItem ${stockItem.name}#${stockItem.id} remaining length exactly.`                );
                 // Case 1: the segment fits the stock remaining length (inc. kerf) exactly
                 clonedStockItem = {
                     ...stockItem,
@@ -81,7 +94,7 @@ export const createSolutionsTree = (
                     _totalKerf: stockItem._totalKerf,
                 } as StockModel;
             } else if (stockItem && cut.length < stockItem._remainingLength - stockItem._totalKerf) {
-                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 2.`);
+                //console.debug(                    `Case 2: cut ${cut.name}#${cut.id} fits stockItem ${stockItem.name}#${stockItem.id} with remainder.`                );
                 // Case 2: the segment fits the stock remaining length (inc. kerf) with remainder
                 clonedStockItem = {
                     ...stockItem,
@@ -89,7 +102,7 @@ export const createSolutionsTree = (
                     _totalKerf: stockItem._totalKerf + kerf,
                 } as StockModel;
             } else if (stockItem && stockItem._remainingQuantity > 1 && cut.length === stock.length) {
-                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 3.`);
+                //console.debug(                    `Case 3: cut ${cut.name}#${cut.id} doesn't fit stockItem ${stockItem.name}#${stockItem.id} remaining length, but there is another stock ${stock.name}#${stock.id} we can use and the cut fits exactly.`                );
                 // Case 3: the segment doesn't fit the stock remaining length, but there is another stock item we can use and the segment fits exactly
                 clonedStockItem = {
                     ...stock,
@@ -97,8 +110,8 @@ export const createSolutionsTree = (
                     _remainingQuantity: stockItem._remainingQuantity - 1,
                     _totalKerf: 0,
                 } as StockModel;
-            } else if (stockItem && stockItem._remainingQuantity > 1 && cut.length === stock.length) {
-                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 4.`);
+            } else if (stockItem && stockItem._remainingQuantity > 1 && cut.length < stock.length) {
+                //console.debug(                    `Case 4: cut ${cut.name}#${cut.id} doesn't fit stockItem ${stockItem.name}#${stockItem.id} remaining length, but there is another stock ${stock.name}#${stock.id} we can use and the cut fits with remainder.`                );
                 // Case 4: the segment doesn't fit the stock remaining length, but there is another stock item we can use and the segment fits with remainder
                 clonedStockItem = {
                     ...stock,
@@ -107,7 +120,7 @@ export const createSolutionsTree = (
                     _totalKerf: kerf,
                 } as StockModel;
             } else if (!stockItem && cut.length === stock.length) {
-                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 5.`);
+                //console.debug(                    `Case 5: this stock ${stock.name}#${stock.id} hasn't been used yet, and it fits the cut ${cut.name}#${cut.id} exactly.`                );
                 // Case 5: this stock hasn't been used yet, and it fits the first one exactly
                 clonedStockItem = {
                     ...stock,
@@ -115,7 +128,7 @@ export const createSolutionsTree = (
                     _totalKerf: 0,
                 } as StockModel;
             } else if (!stockItem && cut.length <= stock.length) {
-                //console.debug(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: case 6.`);
+                //console.debug(                    `Case 6: this stock ${stock.name}#${stock.id} hasn't been used yet, and it fits the cut ${cut.name}#${cut.id} with remainder.`                );
                 // Case 6: this stock hasn't been used yet, and it fits the first one with remainder
                 clonedStockItem = {
                     ...stock,
@@ -123,11 +136,12 @@ export const createSolutionsTree = (
                     _totalKerf: kerf,
                 } as StockModel;
             } else {
-                console.error(`buildTree [cutIndex=${cutIndex},stock=${stock.id}]: no fit.`);
+                //console.error(                    `Error: cut ${cut.name}#${cut.id} doesn't fit stockItem ${stockItem?.name}#${stockItem?.id} nor stock ${stock.name}#${stock.id} and there are no more stock to use.`                );
             }
 
             if (clonedStockItem) {
                 const newNode = {
+                    id: nodeIdMaker.next().value as number,
                     stock: clonedStockItem,
                     cut: cut,
                     parent: node,
@@ -135,11 +149,14 @@ export const createSolutionsTree = (
                     _complete: cutIndex === 0,
                 } as Node;
                 node.children.push(newNode);
+                //console.debug(`Adding node #${newNode.id} to node #${node.id}.`);
                 let result = buildTree(newNode, cutIndex - 1);
                 node._complete = result;
                 completed = result ? true : completed;
             }
+            //console.groupEnd();
         }
+        //console.groupEnd();
         return completed;
     };
 
