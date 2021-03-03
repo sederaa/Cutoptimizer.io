@@ -27,6 +27,11 @@ const findStockItemInParents = (node: Node, stockId: number): StockModel | undef
     return findStockItemInParents(node.parent, stockId);
 };
 
+function* idMaker() {
+    var index = 0;
+    while (true) yield index++;
+}
+
 export const createSolutionsTree = (
     cuts: CutModel[],
     stocks: StockModel[],
@@ -35,7 +40,17 @@ export const createSolutionsTree = (
 ): Node => {
     //console.debug(        `createSolutionsTree: cuts = `,        cuts,        `, stock = `,        stocks,        `, buyableStocks = `,        buyableStocks,        `, kerf = ${kerf}.`    );
 
-    let expandedCuts = cuts.flatMap((c) => range(1, (c.quantity ?? 1) + 1).map((i) => ({ ...c, id: c.id + i / 100 })));
+    var nodeIdMaker = idMaker();
+    var stockInstanceIdMaker = idMaker();
+    var cutInstanceIdMaker = idMaker();
+
+    let expandedCuts = cuts.flatMap((c) =>
+        range(1, (c.quantity ?? 1) + 1).map((i) => ({
+            ...c,
+            id: c.id,
+            instanceId: cutInstanceIdMaker.next().value as number,
+        }))
+    );
     // sort cuts by length ascending
     expandedCuts.sort((s1, s2) => (s1.length === s2.length ? 0 : s1.length < s2.length ? 1 : -1));
     //console.debug(`createSolutionsTree: expandedCuts sorted = `, expandedCuts);
@@ -57,13 +72,6 @@ export const createSolutionsTree = (
             } as StockModel)
     );
     Array.prototype.push.apply(stocks, buyableStocksTemp);
-
-    function* idMaker() {
-        var index = 0;
-        while (true) yield index++;
-    }
-    var nodeIdMaker = idMaker();
-    var stockInstanceIdMaker = idMaker();
 
     const root = new Node();
     root.id = nodeIdMaker.next().value as number;
