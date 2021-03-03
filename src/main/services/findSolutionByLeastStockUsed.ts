@@ -51,4 +51,5 @@ export const findSolutionByLeastStockUsed = (node: Node) => {
     }
 
     console.debug(`merged stock nodes = `, stocks);
+    return stocks;
 };

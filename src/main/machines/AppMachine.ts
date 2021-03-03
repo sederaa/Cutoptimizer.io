@@ -10,6 +10,7 @@ import { findSolutionByLeastStockUsed } from "main/services/findSolutionByLeastS
 
 interface AppMachineContext {
     input: Input;
+    solution?: StockModel[];
 }
 
 interface Input {
@@ -105,16 +106,19 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
             ],
         },
         [AppMachineStates.Calculating]: {
-            entry: (context) => {
-                const treeRootNode = createSolutionsTree(
-                    context.input.cuts,
-                    context.input.stocks,
-                    context.input.buyableStocks,
-                    context.input.kerf
-                );
-                printTree(treeRootNode, 0);
-                findSolutionByLeastStockUsed(treeRootNode);
-            },
+            entry: assign({
+                solution: (context) => {
+                    const treeRootNode = createSolutionsTree(
+                        context.input.cuts,
+                        context.input.stocks,
+                        context.input.buyableStocks,
+                        context.input.kerf
+                    );
+                    printTree(treeRootNode, 0);
+                    const stocks = findSolutionByLeastStockUsed(treeRootNode);
+                    return stocks;
+                },
+            }),
             always: AppMachineStates.Idle,
         },
     },

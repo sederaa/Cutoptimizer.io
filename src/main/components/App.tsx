@@ -45,7 +45,7 @@ const App = () => {
                 stock={state.context.input.stocks}
                 onStockChanged={handleStockChanged}
             />
-            <CutList />
+            <CutList solution={state.context.solution} />
         </StyledApp>
     );
 };
