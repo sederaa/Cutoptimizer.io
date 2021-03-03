@@ -2,6 +2,7 @@ import { Node } from "main/services/createSolutionsTree";
 import { StockModel } from "main/models/StockModel";
 
 const assignStockPiecesUsed = (node: Node, stockIds: Set<number>) => {
+    if (!node._complete) return;
     let nodeStockIds = new Set(stockIds);
     if (node.stock) {
         nodeStockIds.add(node.stock.id);
@@ -34,7 +35,7 @@ const findLeafNodeWithLowestStockUsed = (node: Node): Node | undefined => {
 };
 
 const getNodeLineage = (node: Node): Node[] => {
-    if (node.parent === undefined) return [node];
+    if (node.parent === undefined || node.parent.stock === undefined || node.parent.cut === undefined) return [node];
     return [node, ...getNodeLineage(node.parent)];
 };
 
@@ -51,4 +52,15 @@ export const findSolutionByLeastStockUsed = (node: Node) => {
     //console.debug(`leafNodeWithLowestStockUsed lineage = `, nodes);
 
     //TODO: merge nodes for the same stock and return stocks with their cuts inside
+    let stocks: StockModel[] = [];
+    for (const node of nodes) {
+        let index = stocks.findIndex((s) => s.instanceId === node.stock.instanceId);
+        if (index > -1) {
+            stocks[index]._cuts = [...(stocks[index]._cuts ?? []), node.cut];
+        } else {
+            stocks.push({ ...node.stock, _cuts: [node.cut] } as StockModel);
+        }
+    }
+
+    console.debug(`merged stock nodes = `, stocks);
 };

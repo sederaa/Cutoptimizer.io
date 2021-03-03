@@ -2,7 +2,6 @@ import { CutModel } from "../models/CutModel";
 import { StockModel } from "../models/StockModel";
 import { BuyableStockModel } from "../models/BuyableStockModel";
 import range from "lodash.range";
-import { createNoSubstitutionTemplateLiteral } from "typescript";
 
 export class Solution {
     stock!: StockModel[];
@@ -64,6 +63,7 @@ export const createSolutionsTree = (
         while (true) yield index++;
     }
     var nodeIdMaker = idMaker();
+    var stockInstanceIdMaker = idMaker();
 
     const root = new Node();
     root.id = nodeIdMaker.next().value as number;
@@ -106,6 +106,7 @@ export const createSolutionsTree = (
                 // Case 3: the segment doesn't fit the stock remaining length, but there is another stock item we can use and the segment fits exactly
                 clonedStockItem = {
                     ...stock,
+                    instanceId: stockInstanceIdMaker.next().value as number,
                     _remainingLength: stock._remainingLength - cut.length,
                     _remainingQuantity: stockItem._remainingQuantity - 1,
                     _totalKerf: 0,
@@ -115,6 +116,7 @@ export const createSolutionsTree = (
                 // Case 4: the segment doesn't fit the stock remaining length, but there is another stock item we can use and the segment fits with remainder
                 clonedStockItem = {
                     ...stock,
+                    instanceId: stockInstanceIdMaker.next().value as number,
                     _remainingLength: stock._remainingLength - cut.length,
                     _remainingQuantity: stockItem._remainingQuantity - 1,
                     _totalKerf: kerf,
@@ -124,6 +126,7 @@ export const createSolutionsTree = (
                 // Case 5: this stock hasn't been used yet, and it fits the first one exactly
                 clonedStockItem = {
                     ...stock,
+                    instanceId: stockInstanceIdMaker.next().value as number,
                     _remainingLength: stock._remainingLength - cut.length,
                     _totalKerf: 0,
                 } as StockModel;
@@ -132,6 +135,7 @@ export const createSolutionsTree = (
                 // Case 6: this stock hasn't been used yet, and it fits the first one with remainder
                 clonedStockItem = {
                     ...stock,
+                    instanceId: stockInstanceIdMaker.next().value as number,
                     _remainingLength: stock._remainingLength - cut.length,
                     _totalKerf: kerf,
                 } as StockModel;
