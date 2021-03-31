@@ -106,18 +106,16 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
             ],
         },
         [AppMachineStates.Calculating]: {
-            entry: assign({
-                solution: (context) => {
-                    const treeRootNode = createSolutionsTree(
-                        context.input.cuts,
-                        context.input.stocks,
-                        context.input.buyableStocks,
-                        context.input.kerf
-                    );
-                    printTree(treeRootNode, 0);
-                    const stocks = findSolutionByLeastStockUsed(treeRootNode);
-                    return stocks;
-                },
+            entry: assign((context) => {
+                const treeRootNode = createSolutionsTree(
+                    context.input.cuts,
+                    context.input.stocks,
+                    context.input.buyableStocks,
+                    context.input.kerf
+                );
+                printTree(treeRootNode, 0);
+                const stocks = findSolutionByLeastStockUsed(treeRootNode);
+                return { solution: stocks };
             }),
             always: AppMachineStates.Idle,
         },
