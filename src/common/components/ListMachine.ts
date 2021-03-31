@@ -47,6 +47,10 @@ interface ListContext {
     onItemsChanged: (items: ListItemModel[]) => void;
 }
 
+const nullIfNaN = (value: number): number | null => {
+    return Number.isNaN(value) ? null : value;
+};
+
 export const ListMachine = Machine<ListContext, ListSchema, ListEvent>({
     initial: ListStates.Idle,
     context: {
@@ -76,7 +80,7 @@ export const ListMachine = Machine<ListContext, ListSchema, ListEvent>({
                         [ev.name]: [nameofListItemModel("length"), nameofListItemModel("quantity")].some(
                             (x) => x === ev.name
                         )
-                            ? parseInt(ev.value)
+                            ? nullIfNaN(parseInt(ev.value, 10))
                             : ev.value,
                     } as ListItemModel,
                 ].sort((a, b) => a.id - b.id);

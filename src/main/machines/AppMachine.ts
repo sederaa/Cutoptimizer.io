@@ -21,14 +21,14 @@ interface Input {
 }
 
 export enum AppMachineStates {
-    Idle = "Idle",
+    Standby = "Standby",
     CheckingReadyForCalculation = "CheckingReadyForCalculation",
     Calculating = "Calculating",
 }
 
 interface AppMachineSchema {
     states: {
-        [AppMachineStates.Idle]: {};
+        [AppMachineStates.Standby]: {};
         [AppMachineStates.CheckingReadyForCalculation]: {};
         [AppMachineStates.Calculating]: {};
     };
@@ -45,7 +45,7 @@ export type SetStockEvent = { type: AppMachineEvents.SetStock; stock: StockModel
 type AppMachineEvent = SetKerfEvent | SetCutsEvent | SetStockEvent;
 
 export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachineEvent>({
-    initial: AppMachineStates.Idle,
+    initial: AppMachineStates.Standby,
     context: {
         input: {
             /*
@@ -67,7 +67,7 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
         },
     },
     states: {
-        [AppMachineStates.Idle]: {
+        [AppMachineStates.Standby]: {
             on: {
                 [AppMachineEvents.SetKerf]: {
                     actions: assign({
@@ -101,7 +101,7 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
                     target: AppMachineStates.Calculating,
                 },
                 {
-                    target: AppMachineStates.Idle,
+                    target: AppMachineStates.Standby,
                 },
             ],
         },
@@ -117,7 +117,7 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
                 const stocks = findSolutionByLeastStockUsed(treeRootNode);
                 return { solution: stocks };
             }),
-            always: AppMachineStates.Idle,
+            always: AppMachineStates.Standby,
         },
     },
 });

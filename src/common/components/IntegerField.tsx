@@ -12,10 +12,11 @@ interface IntegerFieldProps {
 
 export const IntegerField = ({ name, value, min, max, placeholder, onChange, onBlur }: IntegerFieldProps) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.value === "") onChange(null);
-        const isNumber = /^\d+$/.test(e.target.value);
-        if (!isNumber) return;
         const numericValue = parseInt(e.target.value);
+        if (Number.isNaN(numericValue)) {
+            onChange(null);
+            return;
+        }
         //console.debug(`handleNumericFieldChange: e.target.value = ${e.target.value}, numericValue = ${numericValue}, isNumber = ${isNumber}.`);
         if (min !== undefined && numericValue < min) return;
         if (max !== undefined && numericValue > max) return;
@@ -28,6 +29,27 @@ export const IntegerField = ({ name, value, min, max, placeholder, onChange, onB
             value={value}
             onChange={handleChange}
             onBlur={onBlur}
+            onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) =>
+                ![
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                    "6",
+                    "7",
+                    "8",
+                    "9",
+                    "Backspace",
+                    "Delete",
+                    "ArrowLeft",
+                    "ArrowRight",
+                    "End",
+                    "Home",
+                    "Tab",
+                ].includes(event.key) && event.preventDefault()
+            }
             placeholder={placeholder}
         />
     );

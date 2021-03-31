@@ -16,21 +16,21 @@ import { AppMachine, AppMachineEvents, SetKerfEvent, SetCutsEvent, SetStockEvent
 const StyledApp = styled.div``;
 
 const App = () => {
-    const [state, send] = useMachine(AppMachine);
-    //console.debug(`App: state.context.input = `, state.context.input);
+    const [machineState, sendMachineEvent] = useMachine(AppMachine);
+    console.debug(`App: machineState.context.input = `, machineState.context.input);
 
     const handleKerfChanged = (kerf: number) => {
-        send({ type: AppMachineEvents.SetKerf, kerf } as SetKerfEvent);
+        sendMachineEvent({ type: AppMachineEvents.SetKerf, kerf } as SetKerfEvent);
     };
 
     const handleCutsChanged = (cuts: CutModel[]) => {
         //console.debug(`App: handleCutsChanged: cuts = `, cuts);
-        send({ type: AppMachineEvents.SetCuts, cuts } as SetCutsEvent);
+        sendMachineEvent({ type: AppMachineEvents.SetCuts, cuts } as SetCutsEvent);
     };
 
     const handleStockChanged = (stock: StockModel[]) => {
         //console.debug(`App: handleStockChanged: stock = `, stock);
-        send({ type: AppMachineEvents.SetStock, stock } as SetStockEvent);
+        sendMachineEvent({ type: AppMachineEvents.SetStock, stock } as SetStockEvent);
     };
 
     return (
@@ -38,14 +38,14 @@ const App = () => {
             <Header />
             <Tagline />
             <InputSection
-                kerf={state.context.input.kerf}
+                kerf={machineState.context.input.kerf}
                 onKerfChanged={handleKerfChanged}
-                cuts={state.context.input.cuts}
+                cuts={machineState.context.input.cuts}
                 onCutsChanged={handleCutsChanged}
-                stock={state.context.input.stocks}
+                stock={machineState.context.input.stocks}
                 onStockChanged={handleStockChanged}
             />
-            <CutList solution={state.context.solution} />
+            <CutList solution={machineState.context.solution} />
         </StyledApp>
     );
 };
