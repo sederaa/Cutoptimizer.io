@@ -1,7 +1,17 @@
+import * as yup from "yup";
+
 export interface CutModel {
     id: number;
-    instanceId: number;
+    instanceId: number | undefined;
     length: number;
     quantity: number | null;
-    name: string;
+    name: string | undefined;
 }
+
+export const CutModelValidationSchema: yup.SchemaOf<CutModel> = yup.object().shape({
+    id: yup.number().typeError("must be number").required("is required"),
+    instanceId: yup.number().typeError("must be number").optional(),
+    length: yup.number().typeError("must be number").required("is required"),
+    quantity: yup.number().typeError("must be number").defined().nullable(),
+    name: yup.string().typeError("must be string").optional(),
+});

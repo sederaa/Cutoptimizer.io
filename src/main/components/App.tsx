@@ -17,7 +17,9 @@ const StyledApp = styled.div``;
 
 const App = () => {
     const [machineState, sendMachineEvent] = useMachine(AppMachine);
+    console.debug(`App: machineState.value = `, machineState.value);
     console.debug(`App: machineState.context.input = `, machineState.context.input);
+    console.debug(`App: machineState.context.error = `, machineState.context.error);
 
     const handleKerfChanged = (kerf: number) => {
         sendMachineEvent({ type: AppMachineEvents.SetKerf, kerf } as SetKerfEvent);
