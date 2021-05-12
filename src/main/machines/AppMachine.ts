@@ -57,8 +57,8 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
                 { id: 3, name: "c3", length: 15, quantity: 1 } as CutModel,
             ],
             stocks: [
-                { id: 10, name: "s1", length: 20, quantity: 1 } as StockModel,
-                { id: 11, name: "s2", length: 10, quantity: 1 } as StockModel,
+                { id: 10, name: "s1", length: 20, quantity: 1, instanceId: 0 } as StockModel,
+                { id: 11, name: "s2", length: 10, quantity: 1, instanceId: 0 } as StockModel,
             ],
             buyableStocks: [] as BuyableStockModel[],
             kerf: 0,
@@ -70,18 +70,24 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
                 [AppMachineEvents.SetKerf]: {
                     actions: assign({
                         input: (context, event: SetKerfEvent) => ({ ...context.input, kerf: event.kerf }),
+                        solution: (c) => undefined,
                     }),
                     target: AppMachineStates.Validating,
                 },
                 [AppMachineEvents.SetCuts]: {
                     actions: assign({
                         input: (context, event: SetCutsEvent) => ({ ...context.input, cuts: event.cuts }),
+                        solution: (c) => undefined,
                     }),
                     target: AppMachineStates.Validating,
                 },
                 [AppMachineEvents.SetStock]: {
                     actions: assign({
-                        input: (context, event: SetStockEvent) => ({ ...context.input, stocks: event.stock }),
+                        input: (context, event: SetStockEvent) => ({
+                            ...context.input,
+                            stocks: event.stock,
+                        }),
+                        solution: (c) => undefined,
                     }),
                     target: AppMachineStates.Validating,
                 },

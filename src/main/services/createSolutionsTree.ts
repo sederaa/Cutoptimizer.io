@@ -13,14 +13,20 @@ export class Solution {
 export class Node {
     id!: number;
     cut!: CutModel;
-    stock!: StockModel;
+    stock!: StockCalcModel;
     parent?: Node;
     children: Node[] = [];
     _stockUsed?: number;
     _complete: boolean = false;
 }
 
-const findStockItemInParents = (node: Node, stockId: number): StockModel | undefined => {
+interface StockCalcModel extends StockModel {
+    _remainingLength: number;
+    _remainingQuantity: number;
+    _totalKerf: number;
+}
+
+const findStockItemInParents = (node: Node, stockId: number): StockCalcModel | undefined => {
     if (!node?.stock) return undefined;
     if (node.stock.id === stockId) return node.stock;
     if (!node.parent) return undefined;
@@ -28,7 +34,7 @@ const findStockItemInParents = (node: Node, stockId: number): StockModel | undef
 };
 
 function* idMaker() {
-    var index = 0;
+    var index = 1;
     while (true) yield index++;
 }
 
@@ -55,13 +61,13 @@ export const createSolutionsTree = (
     expandedCuts.sort((s1, s2) => (s1.length === s2.length ? 0 : s1.length < s2.length ? 1 : -1));
     //console.debug(`createSolutionsTree: expandedCuts sorted = `, expandedCuts);
 
-    stocks = stocks.map(
+    let calcStocks = stocks.map(
         (s) =>
             ({
                 ...s,
                 _remainingLength: s.length,
                 _remainingQuantity: s.quantity,
-            } as StockModel)
+            } as StockCalcModel)
     );
     const buyableStocksTemp = buyableStocks.map(
         (bs) =>
@@ -69,9 +75,9 @@ export const createSolutionsTree = (
                 ...bs,
                 _remainingLength: bs.length,
                 _remainingQuantity: Number.POSITIVE_INFINITY,
-            } as StockModel)
+            } as StockCalcModel)
     );
-    Array.prototype.push.apply(stocks, buyableStocksTemp);
+    Array.prototype.push.apply(calcStocks, buyableStocksTemp);
 
     const root = new Node();
     root.id = nodeIdMaker.next().value as number;
@@ -87,28 +93,30 @@ export const createSolutionsTree = (
         node.children = node.children ?? [];
         let completed: boolean = false;
 
-        for (const stock of stocks) {
+        for (const stock of calcStocks) {
             // get this stock item from further up the chain, otherwise use stock
             const stockItem = findStockItemInParents(node, stock.id);
             //console.group(`stock=`, stock, `, stockItem=`, stockItem);
             // create node if it fits
-            let clonedStockItem: StockModel | undefined = undefined;
+            let clonedStockItem: StockCalcModel | undefined = undefined;
             if (stockItem && cut.length === stockItem._remainingLength - stockItem._totalKerf) {
                 //console.debug(                    `Case 1: cut ${cut.name}#${cut.id} fits stockItem ${stockItem.name}#${stockItem.id} remaining length exactly.`                );
                 // Case 1: the segment fits the stock remaining length (inc. kerf) exactly
                 clonedStockItem = {
                     ...stockItem,
+                    instanceId: stockInstanceIdMaker.next().value as number,
                     _remainingLength: stockItem._remainingLength - cut.length,
                     _totalKerf: stockItem._totalKerf,
-                } as StockModel;
+                } as StockCalcModel;
             } else if (stockItem && cut.length < stockItem._remainingLength - stockItem._totalKerf) {
                 //console.debug(                    `Case 2: cut ${cut.name}#${cut.id} fits stockItem ${stockItem.name}#${stockItem.id} with remainder.`                );
                 // Case 2: the segment fits the stock remaining length (inc. kerf) with remainder
                 clonedStockItem = {
                     ...stockItem,
+                    instanceId: stockInstanceIdMaker.next().value as number,
                     _remainingLength: stockItem._remainingLength - cut.length,
                     _totalKerf: stockItem._totalKerf + kerf,
-                } as StockModel;
+                } as StockCalcModel;
             } else if (stockItem && stockItem._remainingQuantity > 1 && cut.length === stock.length) {
                 //console.debug(                    `Case 3: cut ${cut.name}#${cut.id} doesn't fit stockItem ${stockItem.name}#${stockItem.id} remaining length, but there is another stock ${stock.name}#${stock.id} we can use and the cut fits exactly.`                );
                 // Case 3: the segment doesn't fit the stock remaining length, but there is another stock item we can use and the segment fits exactly
@@ -118,7 +126,7 @@ export const createSolutionsTree = (
                     _remainingLength: stock._remainingLength - cut.length,
                     _remainingQuantity: stockItem._remainingQuantity - 1,
                     _totalKerf: 0,
-                } as StockModel;
+                } as StockCalcModel;
             } else if (stockItem && stockItem._remainingQuantity > 1 && cut.length < stock.length) {
                 //console.debug(                    `Case 4: cut ${cut.name}#${cut.id} doesn't fit stockItem ${stockItem.name}#${stockItem.id} remaining length, but there is another stock ${stock.name}#${stock.id} we can use and the cut fits with remainder.`                );
                 // Case 4: the segment doesn't fit the stock remaining length, but there is another stock item we can use and the segment fits with remainder
@@ -128,7 +136,7 @@ export const createSolutionsTree = (
                     _remainingLength: stock._remainingLength - cut.length,
                     _remainingQuantity: stockItem._remainingQuantity - 1,
                     _totalKerf: kerf,
-                } as StockModel;
+                } as StockCalcModel;
             } else if (!stockItem && cut.length === stock.length) {
                 //console.debug(                    `Case 5: this stock ${stock.name}#${stock.id} hasn't been used yet, and it fits the cut ${cut.name}#${cut.id} exactly.`                );
                 // Case 5: this stock hasn't been used yet, and it fits the first one exactly
@@ -137,7 +145,7 @@ export const createSolutionsTree = (
                     instanceId: stockInstanceIdMaker.next().value as number,
                     _remainingLength: stock._remainingLength - cut.length,
                     _totalKerf: 0,
-                } as StockModel;
+                } as StockCalcModel;
             } else if (!stockItem && cut.length <= stock.length) {
                 //console.debug(                    `Case 6: this stock ${stock.name}#${stock.id} hasn't been used yet, and it fits the cut ${cut.name}#${cut.id} with remainder.`                );
                 // Case 6: this stock hasn't been used yet, and it fits the first one with remainder
@@ -146,7 +154,7 @@ export const createSolutionsTree = (
                     instanceId: stockInstanceIdMaker.next().value as number,
                     _remainingLength: stock._remainingLength - cut.length,
                     _totalKerf: kerf,
-                } as StockModel;
+                } as StockCalcModel;
             } else {
                 //console.error(                    `Error: cut ${cut.name}#${cut.id} doesn't fit stockItem ${stockItem?.name}#${stockItem?.id} nor stock ${stock.name}#${stock.id} and there are no more stock to use.`                );
             }
@@ -168,6 +176,9 @@ export const createSolutionsTree = (
             }
             //console.groupEnd();
         }
+
+        root._complete = completed;
+
         //console.groupEnd();
         return completed;
     };

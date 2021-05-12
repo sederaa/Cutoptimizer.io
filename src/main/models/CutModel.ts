@@ -12,6 +12,6 @@ export const CutModelValidationSchema: yup.SchemaOf<CutModel> = yup.object().sha
     id: yup.number().typeError("must be number").required("is required"),
     instanceId: yup.number().typeError("must be number").optional(),
     length: yup.number().typeError("must be number").required("is required"),
-    quantity: yup.number().typeError("must be number").defined().nullable(),
+    quantity: yup.number().typeError("must be number").required("is required"),
     name: yup.string().typeError("must be string").optional(),
 });

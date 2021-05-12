@@ -10,6 +10,7 @@ export const findSolutionByLeastStockUsed = (node: Node) => {
     let leafNodeWithLowestStockUsed: Node | undefined = undefined;
 
     const findLeafNodeWithLowestStockUsed = (node: Node, stockIds: Set<number>) => {
+        //console.debug(`findLeafNodeWithLowestStockUsed: node = `, node);
         if (!node._complete) return;
         let nodeStockIds = new Set(stockIds);
         if (node.stock) {
@@ -30,10 +31,8 @@ export const findSolutionByLeastStockUsed = (node: Node) => {
         }
     };
     findLeafNodeWithLowestStockUsed(node, new Set());
-
-    if (leafNodeWithLowestStockUsed === undefined) return undefined;
-
     //console.debug(`leafNodeWithLowestStockUsed = `, leafNodeWithLowestStockUsed);
+    if (leafNodeWithLowestStockUsed === undefined) return undefined;
 
     const nodes = getNodeLineage(leafNodeWithLowestStockUsed);
 
