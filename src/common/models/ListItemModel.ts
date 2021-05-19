@@ -2,7 +2,7 @@ import { nameofFactory } from "common/utilities/nameofFactory";
 
 export interface ListItemModel {
     id: number;
-    name: string;
+    name: string | undefined;
     length: number | null;
     quantity: number | null;
 }

@@ -4,10 +4,11 @@ import { IntegerField } from "common/components/IntegerField";
 
 interface SettingsProps {
     kerf: number;
+    kerfError: string | undefined;
     onKerfChanged: (kerf: number) => void;
 }
 
-export const Settings = ({ kerf, onKerfChanged }: SettingsProps) => {
+export const Settings = ({ kerf, onKerfChanged, kerfError }: SettingsProps) => {
     return (
         <StyledSettings>
             <h1>Settings</h1>

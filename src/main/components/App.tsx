@@ -17,7 +17,9 @@ const StyledApp = styled.div``;
 
 const App = () => {
     const [machineState, sendMachineEvent] = useMachine(AppMachine);
+    console.debug(`App: machineState.value = `, machineState.value);
     console.debug(`App: machineState.context.input = `, machineState.context.input);
+    console.debug(`App: machineState.context.errors = `, machineState.context.errors);
 
     const handleKerfChanged = (kerf: number) => {
         sendMachineEvent({ type: AppMachineEvents.SetKerf, kerf } as SetKerfEvent);
@@ -44,6 +46,7 @@ const App = () => {
                 onCutsChanged={handleCutsChanged}
                 stock={machineState.context.input.stocks}
                 onStockChanged={handleStockChanged}
+                errors={machineState.context.errors}
             />
             <CutList solution={machineState.context.solution} />
         </StyledApp>
