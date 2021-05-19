@@ -9,9 +9,10 @@ import constants from "constants.json";
 interface ListProps {
     items: ListItemModel[];
     onItemsChanged: (items: ListItemModel[]) => void;
+    errors?: Array<{ [Property in keyof ListItemModel]: string | undefined }>;
 }
 
-export const List = ({ items, onItemsChanged }: ListProps) => {
+export const List = ({ items, onItemsChanged, errors }: ListProps) => {
     const [state, sendEvent] = useMachine(ListMachine, { context: { onItemsChanged } });
     //console.debug(`state.context.items = `, state.context.items);
 
@@ -36,12 +37,13 @@ export const List = ({ items, onItemsChanged }: ListProps) => {
     return (
         <>
             <ul>
-                {items.map((i) => (
+                {items.map((item, index) => (
                     <ListItem
-                        key={i.id}
-                        data={i}
+                        key={item.id}
+                        data={item}
                         handleDeleteItem={handleDeleteItem}
                         handleUpdateField={handleUpdateField}
+                        errors={errors?.[index]}
                     />
                 ))}
             </ul>
@@ -54,9 +56,10 @@ interface ListItemProps {
     data: ListItemModel;
     handleDeleteItem: (id: number) => void;
     handleUpdateField: (id: number, name: keyof Omit<ListItemModel, "id">, value: string) => void;
+    errors: { [Property in keyof ListItemModel]: string | undefined } | undefined;
 }
 
-export const ListItem = ({ data, handleDeleteItem, handleUpdateField }: ListItemProps) => {
+export const ListItem = ({ data, handleDeleteItem, handleUpdateField, errors }: ListItemProps) => {
     return (
         <li>
             {data.id}.
@@ -67,6 +70,7 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField }: ListItem
                 onChange={(e) => handleUpdateField(data.id, "name", e.target.value)}
                 placeholder="Name"
                 maxLength={constants.Entities.ListItem.Name.Maxlength}
+                style={errors?.["name"] ? { borderColor: "red" } : undefined}
             />
             <IntegerField
                 name="length"
@@ -74,6 +78,7 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField }: ListItem
                 value={data.length ?? ""}
                 min={constants.Entities.ListItem.Length.Min}
                 max={constants.Entities.ListItem.Length.Max}
+                error={errors?.["length"]}
                 onChange={(value) => handleUpdateField(data.id, "length", value?.toString() ?? "")}
             />
             <IntegerField
@@ -82,9 +87,11 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField }: ListItem
                 value={data.quantity ?? ""}
                 min={constants.Entities.ListItem.Quantity.Min}
                 max={constants.Entities.ListItem.Quantity.Max}
+                error={errors?.["quantity"]}
                 onChange={(value) => handleUpdateField(data.id, "quantity", value?.toString() ?? "")}
             />
             <button onClick={() => handleDeleteItem(data.id)}>x</button>
+            {/* {JSON.stringify(errors)} */}
         </li>
     );
 };

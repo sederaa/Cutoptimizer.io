@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import { nameofFactory } from "common/utilities/nameofFactory";
 
 export interface CutModel {
     id: number;
@@ -7,6 +8,8 @@ export interface CutModel {
     quantity: number | null;
     name: string | undefined;
 }
+
+export const nameofCutModel = nameofFactory<CutModel>();
 
 export const CutModelValidationSchema: yup.SchemaOf<CutModel> = yup.object().shape({
     id: yup.number().typeError("must be number").required("is required"),

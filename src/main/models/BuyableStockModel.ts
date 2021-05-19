@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import { nameofFactory } from "common/utilities/nameofFactory";
 
 export class BuyableStockModel {
     id!: number;
@@ -6,6 +7,8 @@ export class BuyableStockModel {
     price: number | undefined = 0;
     name!: string;
 }
+
+export const nameofBuyableStockModel = nameofFactory<BuyableStockModel>();
 
 export const BuyableStockModelValidationSchema: yup.SchemaOf<BuyableStockModel> = yup.object().shape({
     id: yup.number().typeError("must be number").required("is required"),

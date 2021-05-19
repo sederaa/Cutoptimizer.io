@@ -1,5 +1,6 @@
 import { CutModel } from "main/models/CutModel";
 import * as yup from "yup";
+import { nameofFactory } from "common/utilities/nameofFactory";
 
 export interface StockModel {
     id: number;
@@ -10,6 +11,8 @@ export interface StockModel {
     name: string;
     _cuts?: CutModel[]; // used at the end to group all cuts into the stock they come from
 }
+
+export const nameofStockModel = nameofFactory<StockModel>();
 
 export const StockModelValidationSchema: yup.SchemaOf<StockModel> = yup.object().shape({
     id: yup.number().typeError("must be number").required("is required"),

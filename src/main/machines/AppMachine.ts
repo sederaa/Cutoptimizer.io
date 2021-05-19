@@ -4,15 +4,15 @@ import { printTree } from "main/services/printTree";
 import { BuyableStockModel } from "main/models/BuyableStockModel";
 import { StockModel } from "main/models/StockModel";
 import { CutModel } from "main/models/CutModel";
-import merge from "lodash.merge";
+import set from "lodash.set";
 import { makeEmptyListItemData, isEmptyListItemData } from "common/models/ListItemModel";
 import { findSolutionByLeastStockUsed } from "main/services/findSolutionByLeastStockUsed";
-import { InputModel, InputModelValidationSchema } from "../models/InputModel";
+import { InputModel, InputModelValidationSchema, InputModelValidationErrors } from "../models/InputModel";
 import * as yup from "yup";
 
 interface AppMachineContext {
     input: InputModel;
-    error?: any;
+    errors?: InputModelValidationErrors;
     solution?: StockModel[];
 }
 
@@ -104,11 +104,15 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
                     target: AppMachineStates.Standby,
                     actions: [
                         // (context, event) => {
-                        //     console.debug(`Validating: onError: event = `, event);
+                        //     //console.debug(`Validating: onError: event = `, event);
                         // },
                         assign({
-                            error: (context, event) =>
-                                event.data.inner.map((e: yup.ValidationError) => `${e.path}: ${e.message}`),
+                            errors: (context, event) =>
+                                event.data.inner.reduce(
+                                    (accumulator: any, e: yup.ValidationError) =>
+                                        set(accumulator, e.path ?? "general", e.message),
+                                    {}
+                                ),
                         }),
                     ],
                 },
