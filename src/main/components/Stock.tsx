@@ -4,6 +4,8 @@ import { List } from "common/components/List";
 import { ListItemModel } from "common/models/ListItemModel";
 import { StockModel } from "main/models/StockModel";
 import { ModelErrorsArray } from "main/models/InputModel";
+import { Heading } from "common/components/Heading";
+import { Section } from "main/components/Section";
 
 interface StockProps {
     stock: StockModel[];
@@ -17,13 +19,11 @@ export const Stock = ({ stock, onStockChanged, errors }: StockProps) => {
     };
     return (
         <StyledStock>
-            <h1>Stock</h1>
+            <Heading as="h2">Stock</Heading>
             Enter your Stock here
             <List items={stock} onItemsChanged={handleItemsChanged} errors={errors} />
         </StyledStock>
     );
 };
 
-const StyledStock = styled.section`
-    padding: 1em;
-`;
+const StyledStock = styled(Section)``;

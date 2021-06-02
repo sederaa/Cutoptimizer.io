@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components";
 
 const StyledSection = styled.section`
-    border-bottom: solid 1px #ccc;
     padding: 1em;
     div {
         max-width: 1200px;
@@ -12,12 +11,9 @@ const StyledSection = styled.section`
 
 interface SectionProps {
     children: React.ReactNode;
+    className?: string;
 }
 
-export const Section = ({ children }: SectionProps) => {
-    return (
-        <StyledSection>
-            <div>{children}</div>
-        </StyledSection>
-    );
+export const Section = ({ children, className }: SectionProps) => {
+    return <StyledSection className={className}>{children}</StyledSection>;
 };

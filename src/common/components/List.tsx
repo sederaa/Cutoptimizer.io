@@ -91,7 +91,6 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField, errors }: 
                 onChange={(value) => handleUpdateField(data.id, "quantity", value?.toString() ?? "")}
             />
             <button onClick={() => handleDeleteItem(data.id)}>x</button>
-            {/* {JSON.stringify(errors)} */}
         </li>
     );
 };

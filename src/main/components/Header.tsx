@@ -1,19 +1,31 @@
 import React from "react";
 import styled from "styled-components";
+import { Heading } from "common/components/Heading";
+
+const Masthead = styled(Heading)`
+    font-size: 3em;
+    margin: 0 auto;
+    color: white;
+    text-align: center;
+`;
 
 const StyledHeader = styled.header`
-    border-bottom: solid 1px #ccc;
-    padding: 1em;
-    div {
-        max-width: 1200px;
-        margin: 0 auto;
+    padding: 1.5rem;
+    background-color: ${(props) => props.theme.colors.dark};
+
+    p {
+        color: white;
+        text-align: center;
+        margin: 0;
+        font-size: small;
     }
 `;
 
 export const Header = () => {
     return (
         <StyledHeader>
-            <div>CUT OPTIMIZER</div>
+            <Masthead>CUT OPTIMIZER</Masthead>
+            <p>Optimize your linear material cuts to reduce waste and save money</p>
         </StyledHeader>
     );
 };

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { IntegerField } from "common/components/IntegerField";
+import { Heading } from "common/components/Heading";
+import { Section } from "main/components/Section";
 
 interface SettingsProps {
     kerf: number;
@@ -11,7 +13,7 @@ interface SettingsProps {
 export const Settings = ({ kerf, onKerfChanged, kerfError }: SettingsProps) => {
     return (
         <StyledSettings>
-            <h1>Settings</h1>
+            <Heading as="h2">Settings</Heading>
             Kerf
             <br />
             <IntegerField
@@ -26,6 +28,6 @@ export const Settings = ({ kerf, onKerfChanged, kerfError }: SettingsProps) => {
     );
 };
 
-const StyledSettings = styled.section`
-    padding: 1em;
+const StyledSettings = styled(Section)`
+    background-color: ${(props) => props.theme.colors.light};
 `;

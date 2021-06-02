@@ -3,17 +3,27 @@ import "sanitize.css";
 import "sanitize.css/forms.css";
 import "sanitize.css/typography.css";
 import { Header } from "main/components/Header";
-import { Tagline } from "main/components/Tagline";
+import { Footer } from "main/components/Footer";
 import { InputSection } from "main/components/InputSection";
 import { CutList } from "main/components/CutList";
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { BuyableStockModel } from "main/models/BuyableStockModel";
 import { StockModel } from "main/models/StockModel";
 import { CutModel } from "main/models/CutModel";
 import { useMachine } from "@xstate/react";
 import { AppMachine, AppMachineEvents, SetKerfEvent, SetCutsEvent, SetStockEvent } from "main/machines/AppMachine";
 
-const StyledApp = styled.div``;
+const theme = {
+    colors: {
+        dark: "#154360",
+        light: "#45b39d",
+        bold: "#f39c12",
+    },
+    fonts: {
+        heading: "Poppins, -apple-system, BlinkMacSystemFont, Arial, sans-serif",
+        text: "-apple-system, BlinkMacSystemFont, Arial, sans-serif",
+    },
+};
 
 const App = () => {
     const [machineState, sendMachineEvent] = useMachine(AppMachine);
@@ -36,9 +46,8 @@ const App = () => {
     };
 
     return (
-        <StyledApp>
+        <ThemeProvider theme={theme}>
             <Header />
-            <Tagline />
             <InputSection
                 kerf={machineState.context.input.kerf}
                 onKerfChanged={handleKerfChanged}
@@ -49,7 +58,8 @@ const App = () => {
                 errors={machineState.context.errors}
             />
             <CutList solution={machineState.context.solution} />
-        </StyledApp>
+            <Footer />
+        </ThemeProvider>
     );
 };
 

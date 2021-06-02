@@ -4,6 +4,8 @@ import { List } from "common/components/List";
 import { ListItemModel } from "common/models/ListItemModel";
 import { CutModel } from "main/models/CutModel";
 import { ModelErrorsArray } from "main/models/InputModel";
+import { Heading } from "common/components/Heading";
+import { Section } from "main/components/Section";
 
 interface CutsProps {
     cuts: CutModel[];
@@ -18,13 +20,13 @@ export const Cuts = ({ cuts, onCutsChanged, errors }: CutsProps) => {
     };
     return (
         <StyledCuts>
-            <h1>Cuts</h1>
+            <Heading as="h2">Cuts</Heading>
             Enter your cuts here
             <List items={cuts} onItemsChanged={handleItemsChanged} errors={errors} />
         </StyledCuts>
     );
 };
 
-const StyledCuts = styled.section`
-    padding: 1em;
+const StyledCuts = styled(Section)`
+    background-color: ${(props) => props.theme.colors.light};
 `;

@@ -28,12 +28,10 @@ export const InputSection = ({
     errors,
 }: InputSectionProps) => {
     return (
-        <StyledInputSection>
+        <>
             <Cuts cuts={cuts} onCutsChanged={onCutsChanged} errors={errors?.cuts} />
             <Stock stock={stock} onStockChanged={onStockChanged} errors={errors?.stocks} />
             <Settings kerf={kerf} onKerfChanged={onKerfChanged} kerfError={errors?.kerf} />
-        </StyledInputSection>
+        </>
     );
 };
-
-const StyledInputSection = styled(Section)``;
