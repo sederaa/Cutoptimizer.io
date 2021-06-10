@@ -5,6 +5,8 @@ import { ListMachine, ListEvents, UpdateFieldEvent, AddEvent, DeleteEvent } from
 import { ListItemModel } from "common/models/ListItemModel";
 import { IntegerField } from "common/components/IntegerField";
 import constants from "constants.json";
+import { StyledInput } from "common/components/StyledInput";
+import { relative } from "node:path";
 
 interface ListProps {
     items: ListItemModel[];
@@ -36,7 +38,7 @@ export const List = ({ items, onItemsChanged, errors }: ListProps) => {
 
     return (
         <>
-            <ul>
+            <StyledUnorderedList>
                 {items.map((item, index) => (
                     <ListItem
                         key={item.id}
@@ -46,7 +48,7 @@ export const List = ({ items, onItemsChanged, errors }: ListProps) => {
                         errors={errors?.[index]}
                     />
                 ))}
-            </ul>
+            </StyledUnorderedList>
             <button onClick={handleAddClick}>+ Add</button>
         </>
     );
@@ -61,17 +63,20 @@ interface ListItemProps {
 
 export const ListItem = ({ data, handleDeleteItem, handleUpdateField, errors }: ListItemProps) => {
     return (
-        <li>
-            {data.id}.
-            <input
-                type="text"
-                name="name"
-                value={data.name}
-                onChange={(e) => handleUpdateField(data.id, "name", e.target.value)}
-                placeholder="Name"
-                maxLength={constants.Entities.ListItem.Name.Maxlength}
-                style={errors?.["name"] ? { borderColor: "red" } : undefined}
-            />
+        <StyledListItem>
+            <div style={{ position: "relative", display: "inline" }}>
+                <StyledInput
+                    type="text"
+                    id={`name-${data.id}`}
+                    name="name"
+                    value={data.name}
+                    onChange={(e) => handleUpdateField(data.id, "name", e.target.value)}
+                    placeholder=" "
+                    maxLength={constants.Entities.ListItem.Name.Maxlength}
+                    style={errors?.["name"] ? { borderColor: "red" } : undefined}
+                />
+                <label htmlFor={`name-${data.id}`}>Name</label>
+            </div>
             <IntegerField
                 name="length"
                 placeholder="Length"
@@ -91,6 +96,15 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField, errors }: 
                 onChange={(value) => handleUpdateField(data.id, "quantity", value?.toString() ?? "")}
             />
             <button onClick={() => handleDeleteItem(data.id)}>x</button>
-        </li>
+        </StyledListItem>
     );
 };
+
+const StyledUnorderedList = styled.ul`
+    list-style-type: none;
+    padding: 0;
+`;
+
+const StyledListItem = styled.li`
+    margin: 0.7em 0;
+`;

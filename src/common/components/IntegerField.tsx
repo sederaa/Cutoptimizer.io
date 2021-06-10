@@ -1,4 +1,5 @@
 import React from "react";
+import { StyledInput } from "common/components/StyledInput";
 
 interface IntegerFieldProps {
     name: string;
@@ -24,7 +25,7 @@ export const IntegerField = ({ name, value, min, max, placeholder, error, onChan
         onChange(numericValue);
     };
     return (
-        <input
+        <StyledInput
             type="text"
             name={name}
             value={value}
