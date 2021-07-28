@@ -48,7 +48,9 @@ export const List = ({ items, onItemsChanged, errors }: ListProps) => {
                     />
                 ))}
             </StyledUnorderedList>
-            <button onClick={handleAddClick}>+ Add</button>
+            <StyledAddButton onClick={handleAddClick}>
+                <span>+</span> Add
+            </StyledAddButton>
         </>
     );
 };
@@ -96,7 +98,9 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField, errors }: 
                 error={errors?.["quantity"]}
                 onChange={(value) => handleUpdateField(data.id, "quantity", value?.toString() ?? "")}
             />
-            <button onClick={() => handleDeleteItem(data.id)}>x</button>
+            <StyledDeleteButton className="delete-button" onClick={() => handleDeleteItem(data.id)}>
+                &times;
+            </StyledDeleteButton>
         </StyledListItem>
     );
 };
@@ -108,4 +112,44 @@ const StyledUnorderedList = styled.ul`
 
 const StyledListItem = styled.li`
     margin: 0.7em 0;
+
+    &:hover .delete-button {
+        display: inline-block;
+    }
+`;
+
+const StyledDeleteButton = styled.button`
+    display: none;
+    border-radius: 3px;
+    background-color: crimson;
+    border-color: crimson;
+    color: white;
+    width: 34px;
+    height: 34px;
+    font-size: x-large;
+    line-height: 0;
+    vertical-align: bottom;
+    cursor: pointer;
+`;
+
+const StyledAddButton = styled.button`
+    color: rgb(32, 34, 35);
+    border-radius: 3px;
+    background-color: white;
+    font-size: smaller;
+    padding-left: 1.5em;
+    height: 32px;
+    padding-right: 1.5em;
+    border-bottom-color: rgb(90, 90, 90);
+    border-right-color: rgb(100, 100, 100);
+    border-left-color: rgb(110, 110, 110);
+    border-top-color: rgb(120, 120, 120);
+    line-height: 0;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    & span {
+        font-size: large;
+        font-weight: bold;
+    }
 `;
