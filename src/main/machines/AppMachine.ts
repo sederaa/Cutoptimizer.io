@@ -92,14 +92,11 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
         },
         [AppMachineStates.Validating]: {
             invoke: {
-                src: (context) => {
-                    console.debug(`AppMachineStates.Validating: context.input = `, context.input);
-                    return InputModelValidationSchema.validate(context.input, { abortEarly: false });
-                },
+                src: (context) => InputModelValidationSchema.validate(context.input, { abortEarly: false }),
                 onDone: {
                     target: AppMachineStates.Calculating,
                     actions: [
-                        (context, event) => console.debug(`Validating: onDone: event = `, event),
+                        //(context, event) => console.debug(`Validating: onDone: event = `, event),
                         assign({
                             errors: (context, event) => undefined,
                         }),
@@ -108,7 +105,7 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
                 onError: {
                     target: AppMachineStates.Standby,
                     actions: [
-                        (context, event) => console.debug(`Validating: onError: event = `, event),
+                        //(context, event) => console.debug(`Validating: onError: event = `, event),
                         assign({
                             errors: (context, event) =>
                                 event.data.inner.reduce(

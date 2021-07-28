@@ -17,10 +17,11 @@ export const Settings = ({ kerf, onKerfChanged, kerfError }: SettingsProps) => {
             Kerf
             <br />
             <IntegerField
+                id="kerf"
                 name="kerf"
                 value={kerf}
                 onChange={(kerf) => onKerfChanged(kerf ?? 0)}
-                placeholder="Kerf"
+                label="Kerf"
                 min={0}
                 max={999}
             />

@@ -6,7 +6,6 @@ import { ListItemModel } from "common/models/ListItemModel";
 import { IntegerField } from "common/components/IntegerField";
 import constants from "constants.json";
 import { StyledInput } from "common/components/StyledInput";
-import { relative } from "node:path";
 
 interface ListProps {
     items: ListItemModel[];
@@ -78,8 +77,9 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField, errors }: 
                 <label htmlFor={`name-${data.id}`}>Name</label>
             </div>
             <IntegerField
+                id={`length-${data.id}`}
                 name="length"
-                placeholder="Length"
+                label="Length"
                 value={data.length ?? ""}
                 min={constants.Entities.ListItem.Length.Min}
                 max={constants.Entities.ListItem.Length.Max}
@@ -87,8 +87,9 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField, errors }: 
                 onChange={(value) => handleUpdateField(data.id, "length", value?.toString() ?? "")}
             />
             <IntegerField
+                id={`quantity-${data.id}`}
                 name="quantity"
-                placeholder="Quantity"
+                label="Quantity"
                 value={data.quantity ?? ""}
                 min={constants.Entities.ListItem.Quantity.Min}
                 max={constants.Entities.ListItem.Quantity.Max}

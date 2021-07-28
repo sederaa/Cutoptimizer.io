@@ -18,6 +18,7 @@ const theme = {
         dark: "#154360",
         light: "#45b39d",
         bold: "#f39c12",
+        error: "crimson",
     },
     fonts: {
         heading: "Poppins, -apple-system, BlinkMacSystemFont, Arial, sans-serif",
@@ -27,9 +28,7 @@ const theme = {
 
 const App = () => {
     const [machineState, sendMachineEvent] = useMachine(AppMachine);
-    console.debug(`App: machineState.value = `, machineState.value);
-    console.debug(`App: machineState.context.input = `, machineState.context.input);
-    console.debug(`App: machineState.context.errors = `, machineState.context.errors);
+    //console.debug(`App: machineState = `, machineState, ` (errors = `, machineState.context.errors, `)`);
 
     const handleKerfChanged = (kerf: number) => {
         sendMachineEvent({ type: AppMachineEvents.SetKerf, kerf } as SetKerfEvent);

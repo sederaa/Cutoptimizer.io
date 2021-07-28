@@ -15,6 +15,7 @@ export const StyledInput = styled.input`
         outline: solid 1px ${(props) => props.theme.colors.dark};
     }
 
+    // label in placeholder position
     & ~ label {
         position: absolute;
         transform-origin: 0 50%;
@@ -24,6 +25,7 @@ export const StyledInput = styled.input`
         pointer-events: none;
     }
 
+    // label in above-input position
     &:focus ~ label,
     &:not(:placeholder-shown) ~ label {
         background-color: ${(props) => props.theme.colors.dark};
@@ -40,5 +42,20 @@ export const StyledInput = styled.input`
 
     &:focus ~ label {
         background-color: ${(props) => props.theme.colors.dark};
+    }
+
+    &.error {
+        border-color: ${(props) => props.theme.colors.error};
+        outline: solid 1px ${(props) => props.theme.colors.error};
+    }
+
+    &.error:placeholder-shown ~ label {
+        color: ${(props) => props.theme.colors.error};
+    }
+
+    &.error:not(:placeholder-shown) ~ label,
+    &.error:focus ~ label {
+        background-color: ${(props) => props.theme.colors.error};
+        color: white;
     }
 `;
