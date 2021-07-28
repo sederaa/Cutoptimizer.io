@@ -1,13 +1,12 @@
 import { Machine, assign } from "xstate";
-import { createSolutionsTree, Node } from "main/services/createSolutionsTree";
+import { createSolutionsTree } from "main/services/createSolutionsTree";
 import { printTree } from "main/services/printTree";
 import { BuyableStockModel } from "main/models/BuyableStockModel";
 import { StockModel } from "main/models/StockModel";
 import { CutModel } from "main/models/CutModel";
 import set from "lodash.set";
-import { makeEmptyListItemData, isEmptyListItemData } from "common/models/ListItemModel";
 import { findSolutionByLeastStockUsed } from "main/services/findSolutionByLeastStockUsed";
-import { InputModel, InputModelValidationSchema, InputModelValidationErrors } from "../models/InputModel";
+import { InputModel, InputModelValidationSchema, InputModelValidationErrors } from "main/models/InputModel";
 import * as yup from "yup";
 
 interface AppMachineContext {
@@ -19,7 +18,6 @@ interface AppMachineContext {
 export enum AppMachineStates {
     Standby = "Standby",
     Validating = "Validating",
-    //CheckingReadyForCalculation = "CheckingReadyForCalculation",
     Calculating = "Calculating",
 }
 
@@ -27,7 +25,6 @@ interface AppMachineSchema {
     states: {
         [AppMachineStates.Standby]: {};
         [AppMachineStates.Validating]: {};
-        //[AppMachineStates.CheckingReadyForCalculation]: {};
         [AppMachineStates.Calculating]: {};
     };
 }
@@ -95,17 +92,23 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
         },
         [AppMachineStates.Validating]: {
             invoke: {
-                src: (context) => InputModelValidationSchema.validate(context.input, { abortEarly: false }),
+                src: (context) => {
+                    console.debug(`AppMachineStates.Validating: context.input = `, context.input);
+                    return InputModelValidationSchema.validate(context.input, { abortEarly: false });
+                },
                 onDone: {
                     target: AppMachineStates.Calculating,
-                    //                    actions: (context, event) => console.debug(`Validating: onDone: event = `, event),
+                    actions: [
+                        (context, event) => console.debug(`Validating: onDone: event = `, event),
+                        assign({
+                            errors: (context, event) => undefined,
+                        }),
+                    ],
                 },
                 onError: {
                     target: AppMachineStates.Standby,
                     actions: [
-                        // (context, event) => {
-                        //     //console.debug(`Validating: onError: event = `, event);
-                        // },
+                        (context, event) => console.debug(`Validating: onError: event = `, event),
                         assign({
                             errors: (context, event) =>
                                 event.data.inner.reduce(
@@ -118,26 +121,9 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
                 },
             },
         },
-        /*
-        [AppMachineStates.CheckingReadyForCalculation]: {
-            always: [
-                {
-                    cond: (context) =>
-                        context.input.cuts.some((c) => !isEmptyListItemData(c)) &&
-                        context.input.stocks.some(
-                            (c) => !isEmptyListItemData(c)
-                        ) /*||
-                            context.input.buyableStocks.some((c) => c.id > 0)* /,
-                    target: AppMachineStates.Calculating,
-                },
-                {
-                    target: AppMachineStates.Standby,
-                },
-            ],
-        },
-        */
         [AppMachineStates.Calculating]: {
             entry: assign((context) => {
+                //console.debug(`AppMachineStates.Calculating: calling createSolutionsTree...`);
                 const treeRootNode = createSolutionsTree(
                     context.input.cuts,
                     context.input.stocks,
