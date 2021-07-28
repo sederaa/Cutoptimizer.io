@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { IntegerField } from "common/components/IntegerField";
+import { IntegerInput } from "common/components/IntegerInput";
 import { Heading } from "common/components/Heading";
 import { Section } from "main/components/Section";
 
@@ -16,14 +16,14 @@ export const Settings = ({ kerf, onKerfChanged, kerfError }: SettingsProps) => {
             <Heading as="h2">Settings</Heading>
             Kerf
             <br />
-            <IntegerField
+            <IntegerInput
                 id="kerf"
                 name="kerf"
                 value={kerf}
                 onChange={(kerf) => onKerfChanged(kerf ?? 0)}
-                label="Kerf"
                 min={0}
                 max={999}
+                hasError={kerfError !== undefined}
             />
         </StyledSettings>
     );
