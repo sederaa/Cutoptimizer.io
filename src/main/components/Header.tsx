@@ -24,7 +24,7 @@ const StyledHeader = styled.header`
 export const Header = () => {
     return (
         <StyledHeader>
-            <Masthead>CUT OPTIMIZER</Masthead>
+            <Masthead>CUT <img src="logo.svg" /> OPTIMIZER</Masthead>
             <p>Optimize your linear material cuts to reduce waste and save money</p>
         </StyledHeader>
     );
