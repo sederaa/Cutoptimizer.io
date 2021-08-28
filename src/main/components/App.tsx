@@ -19,6 +19,7 @@ const theme = {
         light: "#45b39d",
         bold: "#f39c12",
         error: "crimson",
+        border: "dimgray",
     },
     fonts: {
         heading: "Poppins, -apple-system, BlinkMacSystemFont, Arial, sans-serif",

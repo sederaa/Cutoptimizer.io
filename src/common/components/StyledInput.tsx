@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const StyledInput = styled.input`
     margin-right: 0.7em;
     border-radius: 3px;
-    border: solid 1px dimgray;
+    border: solid 1px ${(props) => props.theme.colors.border};
     background-color: white;
 
     &:first-child {
@@ -37,7 +37,7 @@ export const StyledInput = styled.input`
     }
 
     &:not(:placeholder-shown) ~ label {
-        background-color: dimgray;
+        background-color: ${(props) => props.theme.colors.border};
     }
 
     &:focus ~ label {
