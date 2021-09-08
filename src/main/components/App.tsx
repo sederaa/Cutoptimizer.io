@@ -19,6 +19,7 @@ const theme = {
         light: "#45b39d",
         bold: "#f39c12",
         error: "crimson",
+        border: "dimgray",
     },
     fonts: {
         heading: "Poppins, -apple-system, BlinkMacSystemFont, Arial, sans-serif",
@@ -56,7 +57,7 @@ const App = () => {
                 onStockChanged={handleStockChanged}
                 errors={machineState.context.errors}
             />
-            <CutList solution={machineState.context.solution} />
+            <CutList solution={machineState.context.solution} kerf={machineState.context.input.kerf} />
             <Footer />
         </ThemeProvider>
     );
