@@ -1,5 +1,5 @@
-import React from "react";
-import styled from "styled-components";
+import React, { useContext } from "react";
+import styled, { ThemeContext } from "styled-components";
 import { Section } from "main/components/Section";
 import { StockModel } from "main/models/StockModel";
 import { CutModel } from "main/models/CutModel";
@@ -11,9 +11,10 @@ const StyledCutList = styled(Section)`
 
 interface CutListProps {
     solution?: StockModel[];
+    kerf: number;
 }
 
-export const CutList = ({ solution }: CutListProps) => {
+export const CutList = ({ solution, kerf }: CutListProps) => {
     const maxWidth = solution
         ?.map((s) => s.length)
         .sort()
@@ -21,7 +22,12 @@ export const CutList = ({ solution }: CutListProps) => {
 
     return (
         <StyledCutList>
-            <Heading as="h2">Cut List</Heading>
+            <div style={{ display: "flex", margin: "0.8em 0" }}>
+                <Heading as="h2" style={{ flex: 1, margin: 0 }}>
+                    Cut List{" "}
+                </Heading>
+                <Key />
+            </div>
 
             {solution && maxWidth !== undefined ? (
                 solution.map((stock, index) => (
@@ -30,6 +36,7 @@ export const CutList = ({ solution }: CutListProps) => {
                         stock={stock}
                         previousStock={index > 0 ? solution[index - 1] : undefined}
                         maxWidth={maxWidth}
+                        kerf={kerf}
                     />
                 ))
             ) : (
@@ -59,6 +66,7 @@ interface StockProps {
     stock: StockModel;
     previousStock?: StockModel;
     maxWidth: number;
+    kerf: number;
 }
 
 const StyledStock = styled.div<StockProps>`
@@ -66,13 +74,7 @@ const StyledStock = styled.div<StockProps>`
     border: solid 1px ${(props) => props.theme.colors.border};
     border-radius: 3px;
     width: ${(props) => (props.stock.length / props.maxWidth) * 100}%;
-    background: repeating-linear-gradient(
-        -45deg,
-        grey,
-        grey 6px,
-        ${(props) => props.theme.colors.border} 6px,
-        ${(props) => props.theme.colors.border} 12px
-    );
+    background-color: grey;
     margin: 3px 0;
 
     & > div {
@@ -90,7 +92,7 @@ const StyledStock = styled.div<StockProps>`
     }
 `;
 
-const Stock = ({ stock, previousStock, maxWidth }: StockProps) => {
+const Stock = ({ stock, previousStock, maxWidth, kerf }: StockProps) => {
     return (
         <>
             {(previousStock === undefined || stock.id !== previousStock.id) && (
@@ -98,9 +100,12 @@ const Stock = ({ stock, previousStock, maxWidth }: StockProps) => {
                     {stock.length} ({stock.name})
                 </div>
             )}
-            <StyledStock stock={stock} maxWidth={maxWidth}>
-                {stock._cuts?.map((cut) => (
-                    <Cut key={cut.instanceId} cut={cut} stockLength={stock.length} />
+            <StyledStock stock={stock} maxWidth={maxWidth} kerf={kerf}>
+                {stock._cuts?.map((cut, index) => (
+                    <>
+                        {index > 0 && kerf > 0 && <Kerf kerf={kerf} stockLength={stock.length} />}
+                        <Cut key={cut.instanceId} cut={cut} stockLength={stock.length} />
+                    </>
                 ))}
             </StyledStock>
         </>
@@ -123,5 +128,69 @@ const Cut = ({ cut, stockLength }: CutProps) => {
         <StyledCut cut={cut} stockLength={stockLength}>
             {cut.length} ({cut.name})
         </StyledCut>
+    );
+};
+
+interface KerfProps {
+    kerf: number;
+    stockLength: number;
+}
+
+const Kerf = styled.div<KerfProps>`
+    flex-basis: ${(props) => (props.kerf / props.stockLength) * 100}%;
+    background: repeating-linear-gradient(
+        -45deg,
+        grey,
+        grey 6px,
+        ${(props) => props.theme.colors.border} 6px,
+        ${(props) => props.theme.colors.border} 12px
+    );
+`;
+
+const Key = () => {
+    const theme = useContext(ThemeContext);
+    return (
+        <ul style={{ flex: 1, listStyleType: "none", display: "flex" }}>
+            <li style={{ marginRight: "1em" }}>
+                <span
+                    style={{
+                        display: "inline-block",
+                        height: "1em",
+                        width: "1em",
+                        backgroundColor: "white",
+                        padding: 0,
+                        marginLeft: "auto",
+                        marginRight: "0.5em",
+                    }}
+                ></span>
+                <span style={{ verticalAlign: "text-bottom" }}>cut</span>
+            </li>
+            <li style={{ marginRight: "1em" }}>
+                <span
+                    style={{
+                        display: "inline-block",
+                        height: "1em",
+                        width: "1em",
+                        background: `repeating-linear-gradient(-45deg,grey,grey 6px,${theme.colors.border} 6px,${theme.colors.border} 12px)`,
+                        padding: 0,
+                        marginRight: "0.5em",
+                    }}
+                ></span>
+                <span style={{ verticalAlign: "text-bottom" }}>kerf</span>
+            </li>
+            <li>
+                <span
+                    style={{
+                        display: "inline-block",
+                        height: "1em",
+                        width: "1em",
+                        backgroundColor: "grey",
+                        padding: 0,
+                        marginRight: "0.5em",
+                    }}
+                ></span>
+                <span style={{ verticalAlign: "text-bottom" }}>spare</span>
+            </li>
+        </ul>
     );
 };

@@ -57,7 +57,7 @@ const App = () => {
                 onStockChanged={handleStockChanged}
                 errors={machineState.context.errors}
             />
-            <CutList solution={machineState.context.solution} />
+            <CutList solution={machineState.context.solution} kerf={machineState.context.input.kerf} />
             <Footer />
         </ThemeProvider>
     );
