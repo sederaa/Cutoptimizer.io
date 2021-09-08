@@ -161,6 +161,7 @@ const Key = () => {
                         padding: 0,
                         marginLeft: "auto",
                         marginRight: "0.5em",
+                        borderRadius: "3px",
                     }}
                 ></span>
                 <span style={{ verticalAlign: "text-bottom" }}>cut</span>
@@ -174,6 +175,7 @@ const Key = () => {
                         background: `repeating-linear-gradient(-45deg,grey,grey 6px,${theme.colors.border} 6px,${theme.colors.border} 12px)`,
                         padding: 0,
                         marginRight: "0.5em",
+                        borderRadius: "3px",
                     }}
                 ></span>
                 <span style={{ verticalAlign: "text-bottom" }}>kerf</span>
@@ -187,6 +189,7 @@ const Key = () => {
                         backgroundColor: "grey",
                         padding: 0,
                         marginRight: "0.5em",
+                        borderRadius: "3px",
                     }}
                 ></span>
                 <span style={{ verticalAlign: "text-bottom" }}>spare</span>
