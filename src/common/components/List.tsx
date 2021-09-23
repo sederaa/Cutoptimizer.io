@@ -14,7 +14,7 @@ interface ListProps {
 }
 
 export const List = ({ items, onItemsChanged, errors }: ListProps) => {
-    const [state, sendEvent] = useMachine(ListMachine, { context: { onItemsChanged } });
+    const [, sendEvent] = useMachine(ListMachine, { context: { onItemsChanged } });
     //console.debug(`state.context.items = `, state.context.items);
 
     const handleAddClick = () => {

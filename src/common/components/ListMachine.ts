@@ -1,4 +1,4 @@
-import { Machine, assign } from "xstate";
+import { Machine } from "xstate";
 import { ListItemModel, makeEmptyListItemData, nameofListItemModel } from "common/models/ListItemModel";
 
 export enum ListStates {
