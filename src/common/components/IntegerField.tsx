@@ -1,5 +1,6 @@
 import React from "react";
 import { IntegerInput } from "common/components/IntegerInput";
+import { Field } from "common/components/Field";
 
 interface IntegerFieldProps {
     id: string;
@@ -15,7 +16,7 @@ interface IntegerFieldProps {
 
 export const IntegerField = ({ id, name, value, min, max, label, error, onChange, onBlur }: IntegerFieldProps) => {
     return (
-        <div style={{ position: "relative", display: "inline" }}>
+        <Field id={id} label={label}>
             <IntegerInput
                 id={id}
                 name={name}
@@ -25,7 +26,6 @@ export const IntegerField = ({ id, name, value, min, max, label, error, onChange
                 onBlur={onBlur}
                 placeholder=" "
             />
-            <label htmlFor={id}>{label}</label>
-        </div>
+        </Field>
     );
 };

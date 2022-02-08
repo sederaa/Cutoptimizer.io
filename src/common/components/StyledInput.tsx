@@ -5,6 +5,8 @@ export const StyledInput = styled.input`
     border-radius: 3px;
     border: solid 1px ${(props) => props.theme.colors.border};
     background-color: white;
+    width: 100%;
+    min-width: 6em;
 
     &:first-child {
         margin-left: 0;
@@ -21,7 +23,7 @@ export const StyledInput = styled.input`
         transform-origin: 0 50%;
         transition: transform 200ms, color 200ms;
         left: 8px;
-        top: -2px;
+        top: 4px;
         pointer-events: none;
     }
 
@@ -33,7 +35,7 @@ export const StyledInput = styled.input`
         padding: 0.1em 1em;
         color: white;
         font-size: small;
-        transform: translateY(-16px) translateX(10px) scale(0.75);
+        transform: translateY(-14px) translateX(10px) scale(0.75);
     }
 
     &:not(:placeholder-shown) ~ label {

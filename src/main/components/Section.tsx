@@ -5,7 +5,6 @@ const StyledSection = styled.section`
     padding: 1em;
 
     div.section-container {
-        max-width: 713px;
         margin: 0 auto;
     }
 `;

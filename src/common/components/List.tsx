@@ -4,8 +4,10 @@ import { useMachine } from "@xstate/react";
 import { ListMachine, ListEvents, UpdateFieldEvent, AddEvent, DeleteEvent } from "common/components/ListMachine";
 import { ListItemModel } from "common/models/ListItemModel";
 import { IntegerField } from "common/components/IntegerField";
+import { Field } from "common/components/Field";
 import constants from "constants.json";
 import { StyledInput } from "common/components/StyledInput";
+import { device } from "common/utilities/device";
 
 interface ListProps {
     items: ListItemModel[];
@@ -65,7 +67,7 @@ interface ListItemProps {
 export const ListItem = ({ data, handleDeleteItem, handleUpdateField, errors }: ListItemProps) => {
     return (
         <StyledListItem>
-            <div style={{ position: "relative", display: "inline" }}>
+            <Field id={`name-${data.id}`} label="Name">
                 <StyledInput
                     type="text"
                     id={`name-${data.id}`}
@@ -76,8 +78,7 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField, errors }: 
                     maxLength={constants.Entities.ListItem.Name.Maxlength}
                     style={errors?.["name"] ? { borderColor: "red" } : undefined}
                 />
-                <label htmlFor={`name-${data.id}`}>Name</label>
-            </div>
+            </Field>
             <IntegerField
                 id={`length-${data.id}`}
                 name="length"
@@ -98,9 +99,11 @@ export const ListItem = ({ data, handleDeleteItem, handleUpdateField, errors }: 
                 error={errors?.["quantity"]}
                 onChange={(value) => handleUpdateField(data.id, "quantity", value?.toString() ?? "")}
             />
-            <StyledDeleteButton className="delete-button" onClick={() => handleDeleteItem(data.id)}>
-                &times;
-            </StyledDeleteButton>
+            <StyledDeleteButtonContainer>
+                <StyledDeleteButton className="delete-button" onClick={() => handleDeleteItem(data.id)}>
+                    &times;
+                </StyledDeleteButton>
+            </StyledDeleteButtonContainer>
         </StyledListItem>
     );
 };
@@ -111,22 +114,33 @@ const StyledUnorderedList = styled.ul`
 `;
 
 const StyledListItem = styled.li`
-    margin: 0.7em 0;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column; // for small mobile
+    margin-bottom: 0.5em;
 
-    &:hover .delete-button {
-        display: inline-block;
+    @media ${device.mobileL} {
+        flex-direction: row; // for large mobile, tablet and desktop
+        margin-bottom: 0;
+    }
+
+    & > * {
+        margin: 0.3em 0.3em 0.3em 0;
     }
 `;
 
+const StyledDeleteButtonContainer = styled.div`
+    text-align: center;
+`;
+
 const StyledDeleteButton = styled.button`
-    display: none;
     border-radius: 3px;
-    background-color: crimson;
+    background-color: white;
     border-color: crimson;
-    color: white;
+    color: crimson;
     width: 34px;
     height: 34px;
-    font-size: x-large;
+    font-size: large;
     line-height: 0;
     vertical-align: bottom;
     cursor: pointer;
