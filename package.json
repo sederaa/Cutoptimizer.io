@@ -3,6 +3,8 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@sentry/react": "^6.17.6",
+        "@sentry/tracing": "^6.17.6",
         "@types/lodash.merge": "^4.6.6",
         "@types/node": "^15.14.9",
         "@types/react": "^17.0.39",
