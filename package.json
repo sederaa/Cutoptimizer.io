@@ -13,6 +13,7 @@
         "@types/styled-components": "^5.1.22",
         "@xstate/react": "^1.6.3",
         "husky": "^7.0.4",
+        "insights-js": "^1.2.11",
         "lint-staged": "^12.3.3",
         "lodash.merge": "^4.6.2",
         "lodash.range": "^3.2.0",
