@@ -30,6 +30,8 @@ const theme = {
 const App = () => {
     const [machineState, sendMachineEvent] = useMachine(AppMachine);
     //console.debug(`App: machineState = `, machineState, ` (errors = `, machineState.context.errors, `)`);
+    //console.debug(`App: machineState.value = `, machineState.value);
+    //console.debug(`App: machineState.context.input = `, machineState.context.input);
 
     const handleKerfChanged = (kerf: number) => {
         sendMachineEvent({ type: AppMachineEvents.SetKerf, kerf } as SetKerfEvent);

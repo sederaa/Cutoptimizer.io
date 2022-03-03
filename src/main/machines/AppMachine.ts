@@ -8,6 +8,7 @@ import set from "lodash.set";
 import { findSolutionByLeastStockUsed } from "main/services/findSolutionByLeastStockUsed";
 import { InputModel, InputModelValidationSchema, InputModelValidationErrors } from "main/models/InputModel";
 import * as yup from "yup";
+import { makeEmptyListItemData } from "common/models/ListItemModel";
 
 interface AppMachineContext {
     input: InputModel;
@@ -43,10 +44,9 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
     initial: AppMachineStates.Standby,
     context: {
         input: {
-            /*
             cuts: [makeEmptyListItemData(0)] as CutModel[],
             stocks: [makeEmptyListItemData(0)] as StockModel[],
-            */
+            /*
 
             cuts: [
                 { id: 1, name: "c1", length: 5, quantity: 1 } as CutModel,
@@ -57,6 +57,8 @@ export const AppMachine = Machine<AppMachineContext, AppMachineSchema, AppMachin
                 { id: 10, name: "s1", length: 20, quantity: 1, instanceId: 0 } as StockModel,
                 { id: 11, name: "s2", length: 10, quantity: 1, instanceId: 0 } as StockModel,
             ],
+            */
+
             buyableStocks: [] as BuyableStockModel[],
             kerf: 0,
         },
