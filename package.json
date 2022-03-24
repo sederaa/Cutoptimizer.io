@@ -1,39 +1,69 @@
 {
-  "name": "cutoptimizer",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.53",
-    "@types/react": "^16.9.44",
-    "@types/react-dom": "^16.9.8",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
-    "typescript": "^3.7.5"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+    "name": "cutoptimizer",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@sentry/react": "^6.17.6",
+        "@sentry/tracing": "^6.17.6",
+        "@types/lodash.merge": "^4.6.6",
+        "@types/node": "^15.14.9",
+        "@types/react": "^17.0.39",
+        "@types/react-dom": "^17.0.11",
+        "@types/rfdc": "^1.2.0",
+        "@types/styled-components": "^5.1.22",
+        "@xstate/react": "^1.6.3",
+        "husky": "^7.0.4",
+        "insights-js": "^1.2.11",
+        "lint-staged": "^12.3.3",
+        "lodash.merge": "^4.6.2",
+        "lodash.range": "^3.2.0",
+        "lodash.set": "^4.3.2",
+        "prettier": "^2.5.1",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-scripts": "^4.0.3",
+        "rfdc": "^1.3.0",
+        "sanitize.css": "^13.0.0",
+        "styled-components": "^5.3.3",
+        "typescript": "^4.5.5",
+        "xstate": "^4.25.0",
+        "yup": "^0.32.11"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject",
+        "storybook": "start-storybook -p 9009 -s public",
+        "build-storybook": "build-storybook -s public"
+    },
+    "eslintConfig": {
+        "extends": "react-app"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+            "prettier --write"
+        ]
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "devDependencies": {
+        "@types/lodash.range": "^3.2.6",
+        "@types/lodash.set": "^4.3.6"
+    }
 }
